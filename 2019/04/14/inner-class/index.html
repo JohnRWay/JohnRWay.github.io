@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一.成员内部类　　内部类中最常见的就是成员内部类，也称为普通内部类。我们来看如下代码：运行结果为： 从上面的代码中我们可以看到，成员内部类的使用方法：　　1.Inner 类定义在 Outer 类的内部，相当于 Outer 类的一个成员变量的位置，Inner 类可以使用任意访问控制符，如 public 、 protected 、 private 等　　2.Inner 类中定义的 test() 方法可">
+<meta name="keywords" content="java,基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java基础内部类详解">
+<meta property="og:url" content="http://yoursite.com/2019/04/14/inner-class/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="一.成员内部类　　内部类中最常见的就是成员内部类，也称为普通内部类。我们来看如下代码：运行结果为： 从上面的代码中我们可以看到，成员内部类的使用方法：　　1.Inner 类定义在 Outer 类的内部，相当于 Outer 类的一个成员变量的位置，Inner 类可以使用任意访问控制符，如 public 、 protected 、 private 等　　2.Inner 类中定义的 test() 方法可">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class1.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class2.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class3.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class4.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class5.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class21.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class22.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class22.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class41.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class42.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class43.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class44.jpg">
+<meta property="og:updated_time" content="2019-04-14T11:39:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java基础内部类详解">
+<meta name="twitter:description" content="一.成员内部类　　内部类中最常见的就是成员内部类，也称为普通内部类。我们来看如下代码：运行结果为： 从上面的代码中我们可以看到，成员内部类的使用方法：　　1.Inner 类定义在 Outer 类的内部，相当于 Outer 类的一个成员变量的位置，Inner 类可以使用任意访问控制符，如 public 、 protected 、 private 等　　2.Inner 类中定义的 test() 方法可">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/14/inner-class/inner-class.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/14/inner-class/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>java基础内部类详解 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/14/inner-class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java基础内部类详解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-14 12:37:08 / Modified: 19:39:24" itemprop="dateCreated datePublished" datetime="2019-04-14T12:37:08+08:00">2019-04-14</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java基础/" itemprop="url" rel="index"><span itemprop="name">java基础</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一-成员内部类"><a href="#一-成员内部类" class="headerlink" title="一.成员内部类"></a>一.成员内部类</h2><p>　　内部类中最常见的就是成员内部类，也称为普通内部类。我们来看如下代码：<br><img src="/2019/04/14/inner-class/inner-class.jpg" alt="img"><br>运行结果为：<br><img src="/2019/04/14/inner-class/inner-class1.jpg" alt="img"></p>
+<p>从上面的代码中我们可以看到，成员内部类的使用方法：<br>　　1.Inner 类定义在 Outer 类的内部，相当于 Outer 类的一个成员变量的位置，Inner 类可以使用任意访问控制符，如 public 、 protected 、 private 等<br>　　2.Inner 类中定义的 test() 方法可以直接访问 Outer 类中的数据，而不受访问控制符的影响，如直接访问 Outer 类中的私有属性a<br>　　3.定义了成员内部类后，必须使用外部类对象来创建内部类对象，而不能直接去 new 一个内部类对象，即：内部类 对象名 = 外部类对象.new 内部类( );<br>　　4.编译上面的程序后，会发现产生了两个.class文件<br><img src="/2019/04/14/inner-class/inner-class2.jpg" alt="img"><br>　　其中，第二个是外部类的 .class 文件，第一个是内部类的 .class 文件，即成员内部类的 .class 文件总是这样：外部类名$内部类名.class</p>
+<p>另外，友情提示哦：<br>    　1.外部类是不能直接使用内部类的成员和方法滴。如：<br><img src="/2019/04/14/inner-class/inner-class3.jpg" alt="img"></p>
+<p>那么外部类如何使用内部类的成员和方法呢？？<br>　　答：可先创建内部类的对象，然后通过内部类的对象来访问其成员变量和方法。</p>
+<p>Java 编译器在创建内部类对象时，隐式的把其外部类对象的引用也传了进去并一直保存着。<br>这样就使得内部类对象始终可以访问其外部类对象，同时这也是为什么在外部类作用范围之外向要创建内部类对象必须先创建其外部类对象的原因。</p>
+<p>　　2.如果外部类和内部类具有相同的成员变量或方法，内部类默认访问自己的成员变量或方法，如果要访问外部类的成员变量，可以使用 this 关键字。如：<br><img src="/2019/04/14/inner-class/inner-class4.jpg" alt="img"><br>　运行结果：<br><img src="/2019/04/14/inner-class/inner-class5.jpg" alt="img"></p>
+<h2 id="二-静态内部类"><a href="#二-静态内部类" class="headerlink" title="二.静态内部类"></a>二.静态内部类</h2><p>　静态内部类是 static 修饰的内部类，这种内部类的特点是：<br>　　1.静态内部类不能直接访问外部类的非静态成员，但可以通过 new 外部类().成员 的方式访问。<br>　　2.如果外部类的静态成员与内部类的成员名称相同，可通过“类名.静态成员”访问外部类的静态成员；如果外部类的静态成员与内部类的成员名称不相同，则可通过“成员名”直接调用外部类的静态成员。<br>　　3.创建静态内部类的对象时，不需要外部类的对象，可以直接创建 内部类 对象名= new 内部类();<br><img src="/2019/04/14/inner-class/inner-class21.jpg" alt="img"><br>运行结果:<br><img src="/2019/04/14/inner-class/inner-class22.jpg" alt="img"></p>
+<h2 id="三-方法内部类"><a href="#三-方法内部类" class="headerlink" title="三.方法内部类"></a>三.方法内部类</h2><p>　　方法内部类就是内部类定义在外部类的方法中，方法内部类只在该方法的内部可见，即只在该方法内可以使用。<br><img src="/2019/04/14/inner-class/inner-class22.jpg" alt="img"></p>
+<p><strong> 注意：</strong>由于方法内部类不能在外部类的方法以外的地方使用，因此方法内部类不能使用访问控制符和static修饰符。</p>
+<h2 id="匿名内部类"><a href="#匿名内部类" class="headerlink" title="匿名内部类　"></a>匿名内部类　</h2><p>匿名类是不能有名称的类，所以没办法引用他们。必须在创建时，作为new语句的一部分来声明他们。但使用匿名内部类还有个前提条件：必须继承一个父类或实现一个接口。<br>这就要采用另一种形式的new语句，如：new &lt;类或接口&gt; &lt;类的主体&gt;<br>这种形式的new语句声明一个新的匿名类，他对一个给定的类进行扩展，或实现一个给定的接口。他还创建那个类的一个新实例，并把他作为语句的结果而返回。要扩展的类和要实现的接口是 new语句的操作数，后跟匿名类的主体。 </p>
+<p>注意匿名类的声明是在编译时进行的，实例化在运行时进行。这意味着 for循环中的一个new语句会创建相同匿名类的几个实例，而不是创建几个不同匿名类的一个实例。<br>从技术上说，匿名类可被视为非静态的内部类，所以他们具备和方法内部声明的非静态内部类相同的权限和限制。</p>
+<p>假如要执行的任务需要一个对象，但却不值得创建全新的对象（原因可能是所需的类过于简单，或是由于他只在一个方法内部使用），匿名类就显得很有用。<br>匿名类尤其适合在Swing应用程式中快速创建事件处理程式。以下是一个匿名内部类的实例：<br>　　1.匿名内部类的基本实现：<br><img src="/2019/04/14/inner-class/inner-class41.jpg" alt="img"><br>运行结果：<br><img src="/2019/04/14/inner-class/inner-class42.jpg" alt="img"><br>可以看到，我们直接将抽象类Person中的方法在大括号中实现了，这样便可以省略一个类的书写，并且，匿名内部类还能用于接口上。</p>
+<p> 　2.在接口上使用匿名内部类：<br><img src="/2019/04/14/inner-class/inner-class43.jpg" alt="img"><br>运行结果：<br><img src="/2019/04/14/inner-class/inner-class44.jpg" alt="img"><br>由上面的例子可以看出，只要一个类是抽象的或是一个接口，那么其子类中的方法都可以使用匿名内部类来实现。</p>
+<p>在使用匿名内部类的过程中，我们需要注意如下几点：<br>        1.使用匿名内部类时，我们必须是继承一个类或者实现一个接口，但是两者不可兼得，同时也只能继承一个类或者实现一个接口。<br>    2.匿名内部类中是不能定义构造函数的。<br>    3.匿名内部类中不能存在任何的静态成员变量和静态方法。<br>    4.匿名内部类为局部内部类（即方法内部类），所以局部内部类的所有限制同样对匿名内部类生效。<br>    5.匿名内部类不能是抽象的，它必须要实现继承的类或者实现的接口的所有抽象方法。</p>
+<h2 id="四-匿名内部类重点难点："><a href="#四-匿名内部类重点难点：" class="headerlink" title="四.匿名内部类重点难点："></a>四.匿名内部类重点难点：</h2><p>1.如果是在一个方法的匿名内部类，可以利用这个方法传进你想要的参数，不过记住，这些参数必须被声明为final 。<br>    使用的形参为何要为final？？<br>    我们给匿名内部类传递参数的时候，若该形参在内部类中需要被使用，那么该形参必须要为final。也就是说：当所在的方法的形参需要被内部类里面使用时，该形参必须为final。</p>
+<p>  首先我们知道在内部类编译成功后，它会产生一个class文件，该class文件与外部类并不是同一class文件，仅仅只保留对外部类的引用。当外部类传入的参数需要被内部类调用时，从java程序的角度来看是直接被调用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class OuterClass &#123;  </span><br><span class="line">        public void display(final String name,String age)&#123;  </span><br><span class="line">            class InnerClass&#123;  </span><br><span class="line">                void <span class="function"><span class="title">display</span></span>()&#123;  </span><br><span class="line">                    System.out.println(name);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>　　从上面代码中看好像name参数应该是被内部类直接调用？其实不然，在java编译之后实际的操作如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class OuterClass<span class="variable">$InnerClass</span> &#123;  </span><br><span class="line">    public InnerClass(String name,String age)&#123;  </span><br><span class="line">        this.InnerClass<span class="variable">$name</span> = name;  </span><br><span class="line">        this.InnerClass<span class="variable">$age</span> = age;  </span><br><span class="line">    &#125;           </span><br><span class="line">    </span><br><span class="line">    public void <span class="function"><span class="title">display</span></span>()&#123;  </span><br><span class="line">        System.out.println(this.InnerClass<span class="variable">$name</span> + <span class="string">"----"</span> + this.InnerClass<span class="variable">$age</span> );  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以从上面代码来看，内部类并不是直接调用方法传递的参数，而是利用自身的构造器对传入的参数进行备份，自己内部方法调用的实际上时自己的属性而不是外部方法传递进来的参数。</p>
+<p>直到这里还没有解释为什么是final。在内部类中的属性和外部方法的参数两者从外表上看是同一个东西，但实际上却不是，所以他们两者是可以任意变化的，也就是说在内部类中我对属性的改变并不会影响到外部的形参，<br>而然这从程序员的角度来看这是不可行的，毕竟站在程序的角度来看这两个根本就是同一个，如果内部类该变了，而外部方法的形参却没有改变这是难以理解和不可接受的，所以为了保持参数的一致性，就规定使用final来避免形参的不改变。</p>
+<p>简单理解就是，拷贝引用，为了避免引用值发生改变，例如被外部类的方法修改等，而导致内部类得到的值不一致，于是用final来让该引用不可改变。<br>故如果定义了一个匿名内部类，并且希望它使用一个其外部定义的参数，那么编译器会要求该参数引用是final的。</p>
+<p>2.匿名内部类中使用初始化代码块</p>
+<p>　　 我们一般都是利用构造器来完成某个实例的初始化工作的，但是匿名内部类是没有构造器的！那怎么来初始化匿名内部类呢？使用构造代码块！利用构造代码块能够达到为匿名内部类创建一个构造器的效果。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public class OutClass &#123;  </span><br><span class="line">        public InnerClass getInnerClass(final int age,final String name)&#123;  </span><br><span class="line">            <span class="built_in">return</span> new <span class="function"><span class="title">InnerClass</span></span>() &#123;  </span><br><span class="line">                int age_ ;  </span><br><span class="line">                String name_;  </span><br><span class="line">                //构造代码块完成初始化工作  </span><br><span class="line">                &#123;  </span><br><span class="line">                    <span class="keyword">if</span>(0 &lt; age &amp;&amp; age &lt; 200)&#123;  </span><br><span class="line">                        age_ = age;  </span><br><span class="line">                        name_ = name;  </span><br><span class="line">                    &#125;  </span><br><span class="line">                &#125;  </span><br><span class="line">                public String <span class="function"><span class="title">getName</span></span>() &#123;  </span><br><span class="line">                    <span class="built_in">return</span> name_;  </span><br><span class="line">                &#125;  </span><br><span class="line">                  </span><br><span class="line">                public int <span class="function"><span class="title">getAge</span></span>() &#123;  </span><br><span class="line">                    <span class="built_in">return</span> age_;  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;;  </span><br><span class="line">        &#125;  </span><br><span class="line">          </span><br><span class="line">        public static void main(String[] args) &#123;  </span><br><span class="line">            OutClass out = new OutClass();  </span><br><span class="line">              </span><br><span class="line">            InnerClass inner_1 = out.getInnerClass(201, <span class="string">"chenssy"</span>);  </span><br><span class="line">            System.out.println(inner_1.getName());  </span><br><span class="line">              </span><br><span class="line">            InnerClass inner_2 = out.getInnerClass(23, <span class="string">"chenssy"</span>);  </span><br><span class="line">            System.out.println(inner_2.getName());  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="五、内部类总结"><a href="#五、内部类总结" class="headerlink" title="五、内部类总结"></a>五、内部类总结</h2><p>　学习了上面四种类型的内部类，我们知道了如何使用各个内部类，那么为什么要使用内部类呢？？<br>    首先举一个简单的例子，如果你想实现一个接口，但是这个接口中的一个方法和你构想的这个类中的一个 方法的名称，参数相同，你应该怎么办？<br>    这时候，你可以建一个内部类实现这个接口。由于内部类对外部类的所有内容都是可访问的，所以这样做可以完成所有你直 接实现这个接口的功能。</p>
+<p>  不过你可能要质疑，更改一下方法的不就行了吗？的确，以此作为设计内部类的理由，实在没有说服力。<br>  真正的原因是这样的，java中的内部类和接口加在一起，可以的解决常被C++程序员抱怨java中存在的一个问题——没有多继承。实际上，C++的多继承设计起来很复杂，而java通过内部类加上接口，可以很好的实现多继承的效果。<br>  内部类：一个内部类的定义是定义在另一个内部的类。<br>　　原因是：<br>　　1.一个内部类的对象能够访问创建它的对象的实现，包括私有数据。<br>　　2.对于同一个包中的其他类来说，内部类能够隐藏起来。<br>　　3.匿名内部类可以很方便的定义回调。<br>　　4.使用内部类可以非常方便的编写事件驱动程序。</p>
+<p>  内部类可以让你更优雅地设计你的程序结构。下面从以下几个方面来介绍：<br>　　首先看这个例子：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public interface Contents &#123;  </span><br><span class="line">    　int value();  </span><br><span class="line">    &#125;  </span><br><span class="line">      </span><br><span class="line">    public interface Destination &#123;  </span><br><span class="line">    　String readLabel();  </span><br><span class="line">    &#125;</span><br><span class="line">```  </span><br><span class="line">```bash</span><br><span class="line">public class Goods &#123;  </span><br><span class="line">    　 private valueRate=2;  </span><br><span class="line">      </span><br><span class="line">    　private class Content implements Contents &#123;  </span><br><span class="line">    　  private int i = 11 * valueRate;  </span><br><span class="line">    　　public int <span class="function"><span class="title">value</span></span>() &#123;  </span><br><span class="line">    　　　<span class="built_in">return</span> i;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　protected class GDestination implements Destination &#123;  </span><br><span class="line">    　　private String label;  </span><br><span class="line">    　　private GDestination(String whereTo) &#123;  </span><br><span class="line">    　　　label = whereTo;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　　public String <span class="function"><span class="title">readLabel</span></span>() &#123;  </span><br><span class="line">    　　　<span class="built_in">return</span> label;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　public Destination dest(String s) &#123;  </span><br><span class="line">    　　<span class="built_in">return</span> new GDestination(s);  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　 public Contents <span class="function"><span class="title">cont</span></span>() &#123;  </span><br><span class="line">    　　<span class="built_in">return</span> new Content();  </span><br><span class="line">    　&#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这个例子里类 Content 和 GDestination 被定义在了类 Goods 内部，并且分别有着 protected 和 private 修饰符来控制访问级别。Content 代表着 Goods 的内容，而 GDestination 代表着 Goods 的目的地。<br>它们分别实现了两个接口Content和Destination。在后面的main方法里，直接用 Contents c 和 Destination d进行操作，你甚至连这两个内部类的名字都没有看见！<br>这样，内部类的第一个好处就体现出来了——隐藏你不想让别人知道的操作，也即封装性。</p>
+<p>非静态内部类对象有着指向其外部类对象的引用<br>修改上面的例子：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class Goods &#123;  </span><br><span class="line">    　 private valueRate=2;  </span><br><span class="line">      </span><br><span class="line">    　private class Content implements Contents &#123;  </span><br><span class="line">    　  private int i = 11 * valueRate;  </span><br><span class="line">    　　public int <span class="function"><span class="title">value</span></span>() &#123;  </span><br><span class="line">    　　　<span class="built_in">return</span> i;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　protected class GDestination implements Destination &#123;  </span><br><span class="line">    　　private String label;  </span><br><span class="line">    　　private GDestination(String whereTo) &#123;  </span><br><span class="line">    　　　label = whereTo;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　　public String <span class="function"><span class="title">readLabel</span></span>() &#123;  </span><br><span class="line">    　　　<span class="built_in">return</span> label;  </span><br><span class="line">    　　&#125;  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　public Destination dest(String s) &#123;  </span><br><span class="line">    　　<span class="built_in">return</span> new GDestination(s);  </span><br><span class="line">    　&#125;  </span><br><span class="line">      </span><br><span class="line">    　 public Contents <span class="function"><span class="title">cont</span></span>() &#123;  </span><br><span class="line">    　　<span class="built_in">return</span> new Content();  </span><br><span class="line">    　&#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这里我们给 Goods 类增加了一个 private 成员变量 valueRate，意义是货物的价值系数，在内部类 Content 的方法 value() 计算价值时把它乘上。<br>我们发现，value() 可以访问 valueRate，这也是内部类的第二个好处——一个内部类对象可以访问创建它的外部类对象的内容，甚至包括私有变量！这是一个非常有用的特性，为我们在设计时提供了更多的思路和捷径。<br>要想实现这个功能，内部类对象就必须有指向外部类对象的引用。Java 编译器在创建内部类对象时，隐式的把其外部类对象的引用也传了进去并一直保存着。<br>这样就使得内部类对象始终可以访问其外部类对象，同时这也是为什么在外部 类作用范围之外向要创建内部类对象必须先创建其外部类对象的原因。</p>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/基础/" rel="tag"># 基础</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/14/java-polymorphic/" rel="next" title="java基础面向对象三大特性之多态">
+                <i class="fa fa-chevron-left"></i> java基础面向对象三大特性之多态
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/14/abstract-inner-class/" rel="prev" title="抽象类和接口的区别">
+                抽象类和接口的区别 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-成员内部类"><span class="nav-number">1.</span> <span class="nav-text">一.成员内部类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-静态内部类"><span class="nav-number">2.</span> <span class="nav-text">二.静态内部类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-方法内部类"><span class="nav-number">3.</span> <span class="nav-text">三.方法内部类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匿名内部类"><span class="nav-number">4.</span> <span class="nav-text">匿名内部类　</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四-匿名内部类重点难点："><span class="nav-number">5.</span> <span class="nav-text">四.匿名内部类重点难点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、内部类总结"><span class="nav-number">6.</span> <span class="nav-text">五、内部类总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

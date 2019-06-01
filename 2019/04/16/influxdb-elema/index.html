@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言Influxdb是一个基于 golang 编写，没有额外依赖的开源时序数据库，用于记录 metrics、events，进行数据分析。这篇文章谈论的 influxdb 版本在1.2.0以上。这篇文章只谈论 influxdb 在监控中的数据存储应用，不会谈论 influxdb 提供的整套监控方案。本文主要谈论五个方面：时序数据库选型、influxdb 基本概念、存储引擎、实践、数据聚合。 选型In">
+<meta name="keywords" content="数据库,TSDB,实践">
+<meta property="og:type" content="article">
+<meta property="og:title" content="饿了么 Influxdb 实践之路">
+<meta property="og:url" content="http://yoursite.com/2019/04/16/influxdb-elema/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="前言Influxdb是一个基于 golang 编写，没有额外依赖的开源时序数据库，用于记录 metrics、events，进行数据分析。这篇文章谈论的 influxdb 版本在1.2.0以上。这篇文章只谈论 influxdb 在监控中的数据存储应用，不会谈论 influxdb 提供的整套监控方案。本文主要谈论五个方面：时序数据库选型、influxdb 基本概念、存储引擎、实践、数据聚合。 选型In">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/04/16/influxdb-elema/influxdb-elema1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/16/influxdb-elema/influxdb-elema2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/16/influxdb-elema/influxdb-elema3.png">
+<meta property="og:updated_time" content="2019-04-16T14:18:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="饿了么 Influxdb 实践之路">
+<meta name="twitter:description" content="前言Influxdb是一个基于 golang 编写，没有额外依赖的开源时序数据库，用于记录 metrics、events，进行数据分析。这篇文章谈论的 influxdb 版本在1.2.0以上。这篇文章只谈论 influxdb 在监控中的数据存储应用，不会谈论 influxdb 提供的整套监控方案。本文主要谈论五个方面：时序数据库选型、influxdb 基本概念、存储引擎、实践、数据聚合。 选型In">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/16/influxdb-elema/influxdb-elema1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/16/influxdb-elema/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>饿了么 Influxdb 实践之路 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/16/influxdb-elema/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">饿了么 Influxdb 实践之路
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-16 21:32:35 / Modified: 22:18:24" itemprop="dateCreated datePublished" datetime="2019-04-16T21:32:35+08:00">2019-04-16</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/influxdb/" itemprop="url" rel="index"><span itemprop="name">influxdb</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://github.com/influxdata/influxdb" target="_blank" rel="noopener">Influxdb</a>是一个基于 golang 编写，没有额外依赖的开源时序数据库，用于记录 metrics、events，进行数据分析。这篇文章谈论的 influxdb 版本在1.2.0以上。<br>这篇文章只谈论 influxdb 在监控中的数据存储应用，不会谈论 influxdb 提供的整套监控方案。本文主要谈论五个方面：时序数据库选型、influxdb 基本概念、存储引擎、实践、数据聚合。</p>
+<h2 id="选型"><a href="#选型" class="headerlink" title="选型"></a>选型</h2><h3 id="Influxdb-vs-Prometheus"><a href="#Influxdb-vs-Prometheus" class="headerlink" title="Influxdb vs Prometheus"></a>Influxdb vs Prometheus</h3><p>influxdb 集成已有的概念，比如查询语法类似 sql，引擎从 LSM 优化而来，学习成本相对低。<br>influxdb 支持的类型有 float，integers，strings，booleans，prometheus 目前只支持 float。<br>influxdb 的时间精度是纳秒，prometheus 的则是毫秒。<br>influxdb 仅仅是个数据库，而 prometheus 提供的是整套监控解决方案，当然 influxdb 也提供了整套监控解决方案。<br>influxdb 支持的 math function 比较少，prometheus 相对来说更多，influxdb 就目前使用上已经满足功能。<br>2015年 prometheus 还在开发阶段，相对来说 influxdb 更加稳定。<br>influxdb 支持 event log，prometheus 不支持。</p>
+<p>更详细的对比请参考：可参考以下做对比<a href="https://db-engines.com/en/system/Graphite%3BInfluxDB%3BPrometheus" target="_blank" rel="noopener">https://db-engines.com/en/system/Graphite%3BInfluxDB%3BPrometheus</a><br>我们其实仅仅需要的是一个数据库，其他组件都是自己开发的，而且存储的数据类型不仅仅是数字，因此选择了 influxdb。希望上面的比较对大家有帮助。</p>
+<h2 id="Influxdb-基本概念"><a href="#Influxdb-基本概念" class="headerlink" title="Influxdb 基本概念"></a>Influxdb 基本概念</h2><h3 id="Database"><a href="#Database" class="headerlink" title="Database"></a>Database</h3><p>数据库是个逻辑容器，包含了 measurement、retention policies、continuous queries、time series data，类似于 mysql 的 database。</p>
+<h3 id="Measurement"><a href="#Measurement" class="headerlink" title="Measurement"></a>Measurement</h3><p>描述了相关数据的存储结构，类似于 mysql 的 table，但是不需要创建，写入数据的时候自动创建。<br>关于 schema 的设计建议参考：设计建议可参考<a href="https://docs.influxdata.com/influxdb/v1.2/concepts/schema_and_data_layout/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.2/concepts/schema_and_data_layout/</a></p>
+<h3 id="Line-Protocol"><a href="#Line-Protocol" class="headerlink" title="Line Protocol"></a>Line Protocol</h3><p>Line Protocol 定义了 influxdb 的数据写入格式，如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">weather,location=us,server=host1 temperature=82 1465839830100400200  |    -------------------- --------------  </span><br><span class="line">|  |             |             |             |  |             |             |             |+-----------+--------+-+---------+-+---------+</span><br><span class="line">|measurement_name|,tag_set| |field_set| |timestamp|+-----------+--------+-+---------+-+---------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Tag"><a href="#Tag" class="headerlink" title="Tag"></a>Tag</h3><p>上面的 location 和 server 就是 tag key，us 和 host1 是 tag value，tag 是可选的。不过写入数据时最好加上 tag，因为它可以被索引。tag 的类型只能是字符串。</p>
+<h3 id="Field"><a href="#Field" class="headerlink" title="Field"></a>Field</h3><p>上面的 temperature 是 field key，82是 field value。field value 会用于展示，value 支持的类型有 floats，integers，strings，booleans。</p>
+<h3 id="Timestamp"><a href="#Timestamp" class="headerlink" title="Timestamp"></a>Timestamp</h3><p>格式是：RFC3339 UTC。默认精确到纳秒，可选。</p>
+<h3 id="Series"><a href="#Series" class="headerlink" title="Series"></a>Series</h3><p>measurement, tag set, retention policy 相同的数据集合算做一个 series。理解这个概念至关重要，因为这些数据存储在内存中，如果 series 太多，会导致 OOM。</p>
+<h3 id="Retention-Policy"><a href="#Retention-Policy" class="headerlink" title="Retention Policy"></a>Retention Policy</h3><p>保留策略包括设置数据保存的时间以及在集群中的副本个数。默认配置是：RP 是 autogen，保留时间是永久，副本为1。这些配置在创建数据库时可以修改。</p>
+<h3 id="Continuous-Query"><a href="#Continuous-Query" class="headerlink" title="Continuous Query"></a>Continuous Query</h3><p>CQ 是预先配置好的一些查询命令，定期自动执行这些命令并将查询结果写入指定的 measurement 中，这个功能主要用于数据聚合。<br>具体参考：<a href="https://docs.influxdata.com/influxdb/v1.2/query_language/continuous_queries/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.2/query_language/continuous_queries/</a></p>
+<h3 id="Shard"><a href="#Shard" class="headerlink" title="Shard"></a>Shard</h3><p>存储一定时间间隔的数据，每个目录对应一个 shard，目录的名字就是shard id。每一个 shard 都有自己的 cache、wal、tsm file 以及 compactor，<br>目的就是通过时间来快速定位到要查询数据的相关资源，加速查询的过程，并且也让之后的批量删除数据的操作变得非常简单且高效。</p>
+<h2 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>TSM Tree 是在 LSM Tree 的基础上稍作修改优化而来。它主要包含四个部分：cache、wal、tsm file、compactor。</p>
+<h3 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h3><p>插入数据时，先往 cache 中写入再写入 wal 中，可以认为 cache 是 wal 文件中的数据在内存中的缓存。</p>
+<h3 id="WAL"><a href="#WAL" class="headerlink" title="WAL"></a>WAL</h3><p>预写日志，对比 mysql 的 binlog。其作用就是为了持久化数据，当系统崩溃后可以通过 wal 文件恢复 cache。</p>
+<h3 id="TSM-File"><a href="#TSM-File" class="headerlink" title="TSM File"></a>TSM File</h3><p>每个 tsm 文件的大小上限是 2GB。当达到cache-snapshot-memory-size,cache-max-memory-size的限制时会触发将 cache 写入 tsm 文件。</p>
+<h3 id="Compactor"><a href="#Compactor" class="headerlink" title="Compactor"></a>Compactor</h3><p>主要进行两种操作，一种是 cache 数据达到阀值后，进行快照，生成一个新的 tsm 文件。另外一种就是合并当前的 tsm 文件，将多个小的 tsm 文件合并成一个，减少文件的数量，并且进行一些数据删除操作。这些操作都在后台自动完成。</p>
+<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><p>InfluxDB 的数据存储有三个目录，分别是 meta、wal、data。meta 用于存储数据库的一些元数据，meta目录下有一个 meta.db 文件。<br>wal 目录存放预写日志文件，以 .wal 结尾。data 目录存放实际存储的数据文件，以 .tsm 结尾。基本结构如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-- wal   -- <span class="built_in">test</span>       -- autogen         </span><br><span class="line">-- 1            -- _00001.wal         </span><br><span class="line">-- 2            -- _00002.wal-- data   -- <span class="built_in">test</span>      -- autogen         </span><br><span class="line">-- 1            -- 000000001-000000001.tsm        </span><br><span class="line"> -- 2            -- 000000001-000000010.tsm-- meta     -- meta.db</span><br></pre></td></tr></table></figure></p>
+<p>其中 test 是数据库名称，autogen 是存储策略名称，再下一层目录中的以数字命名的目录是 shard 的 ID 值，<br>比如 autogen 存储策略下有两个 shard，ID 分别为 1 和 2，shard 存储了某一个时间段范围内的数据。再下一级的目录则为具体的文件，分别是 .wal和 .tsm结尾的文件。</p>
+<p>更详细的参考<br>InfluxDB 详解之<a href="http://blog.fatedier.com/2016/08/05/detailed-in-influxdb-tsm-storage-engine-one/" target="_blank" rel="noopener">SM 存储引擎解析</a></p>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><h3 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h3><p><a href="https://github.com/pingliu/influxdb-gateway" target="_blank" rel="noopener">gateway</a>用于检测和压缩influxdb的数据，用于跨机房传输，采用udp接受数据。<br><a href="https://github.com/influxdata/influxdb-relay" target="_blank" rel="noopener">influxdb-relay</a>是官方提供的高可用方案，但是它只提供简单的写入功能。<br><a href="https://github.com/shell909090/influx-proxy" target="_blank" rel="noopener">influxdb-proxy</a>是用于替代 influxdb-relay 的高可用方案。</p>
+<h3 id="前期架构图"><a href="#前期架构图" class="headerlink" title="前期架构图"></a>前期架构图</h3><p><img src="/2019/04/16/influxdb-elema/influxdb-elema1.png" alt="img"></p>
+<h3 id="使用问题"><a href="#使用问题" class="headerlink" title="使用问题"></a>使用问题</h3><p>influxdb-relay 是官方提供的高可用方案，但是它只提供简单的写入功能。在初期使用时，并没有多大的问题，随着 influxdb 在公司的推广，接入方越来越多，意味着查询方越来越多，这就带来了以下问题：<br>grafana 需要配置很多个数据源。<br>用户不能根据 measurement 来订阅数据。<br>数据库挂掉，就需要修改 grafana 的数据源。<br>维护困难，比如需要新增数据库，用户需要配置多个数据源，不能统一接入点。<br>用户查询直连数据库，用户select *数据库直接 OOM，数据库会重启。<br>relay提供的重写功能，数据是保留在内存中，一旦 influxdb 挂掉，就会导致relay机器内存疯涨。</p>
+<h3 id="踩过的坑"><a href="#踩过的坑" class="headerlink" title="踩过的坑"></a>踩过的坑</h3><p>max-row-limit不为0，会导致 influxdb OOM。目前这个问题已经修复，但是 grafana 展示时会存在问题，配置时请设置为0。<br>配置查询限制参数时，会导致一些奇怪的问题，官方是不限制，请保留默认配置。<br>没有制定 schema 规范，接入方把 field写成 tag 了，导致内存疯涨，最后 OOM。理解 series 的概念很重要。<br>写入超时时间默认是10s，有时候数据写入了但返回 500。可以将这个时间设置成大点。</p>
+<h3 id="优化后的架构图"><a href="#优化后的架构图" class="headerlink" title="优化后的架构图"></a>优化后的架构图</h3><p><img src="/2019/04/16/influxdb-elema/influxdb-elema2.png" alt="img"></p>
+<p>influxdb-proxy 是为了解决上面的使用问题而开发出来的。具有以下功能：<br>同时支持写和查询功能，统一接入点，类似cluster。<br>支持重写功能，写入失败时写入文件，后端恢复时再写入。<br>限制部分查询命令和全部删除操作。<br>以 measurement 为粒度区分数据，支持按需订阅。<br>measurement 优先精确匹配，然后前缀匹配。<br>提供数据统计，比如 qps，耗时等等。</p>
+<h2 id="数据聚合"><a href="#数据聚合" class="headerlink" title="数据聚合"></a>数据聚合</h2><h3 id="CQ"><a href="#CQ" class="headerlink" title="CQ"></a>CQ</h3><p>influxdb 提供数据聚合的功能，就是上面基本概念里提到的 Continuous Query。预先定义好cq，就可以定期根据不同的tag进行聚合数据。<br>目前它有个设计问题：cq 是顺序执行的，cq 越多，数据延迟越高，一般延迟在几分钟内。如果需要更实时的聚合，cq 不能满足，需要引入其他工具，比如spark。<br>关于 cq 的语法请参考：<a href="https://docs.influxdata.com/influxdb/v1.2/query_language/continuous_queries/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.2/query_language/continuous_queries/</a></p>
+<h3 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h3><p>经过内部调研，发现 spark+kafka 是个更好的聚合方案。spark支持流式处理且支持 sql 功能，我们只需要将cq改成sql就行。目前这个处于尝试阶段，已经上线部分功能。目前的处理流程如下：</p>
+<p><img src="/2019/04/16/influxdb-elema/influxdb-elema3.png" alt="img"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>上文讲的整套架构已经支撑起饿了么2万台机器的监控，目前每秒写入的点数是300k。后端 influxdb 的机器数量是20台左右，维护成本基本趋于零。我们的焦点目前已经从 influxdb 转移到数据聚合和分析上。</p>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/TSDB/" rel="tag"># TSDB</a>
+          
+            <a href="/tags/实践/" rel="tag"># 实践</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/16/influx-relay-introduce/" rel="next" title="influxdb高可用层InfluxDB Relay使用介绍">
+                <i class="fa fa-chevron-left"></i> influxdb高可用层InfluxDB Relay使用介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/22/engineers-way/" rel="prev" title="工程师能力模型告诉你写代码这条路怎么走多远">
+                工程师能力模型告诉你写代码这条路怎么走多远 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选型"><span class="nav-number">2.</span> <span class="nav-text">选型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Influxdb-vs-Prometheus"><span class="nav-number">2.1.</span> <span class="nav-text">Influxdb vs Prometheus</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Influxdb-基本概念"><span class="nav-number">3.</span> <span class="nav-text">Influxdb 基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Database"><span class="nav-number">3.1.</span> <span class="nav-text">Database</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Measurement"><span class="nav-number">3.2.</span> <span class="nav-text">Measurement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Line-Protocol"><span class="nav-number">3.3.</span> <span class="nav-text">Line Protocol</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tag"><span class="nav-number">3.4.</span> <span class="nav-text">Tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Field"><span class="nav-number">3.5.</span> <span class="nav-text">Field</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Timestamp"><span class="nav-number">3.6.</span> <span class="nav-text">Timestamp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Series"><span class="nav-number">3.7.</span> <span class="nav-text">Series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Retention-Policy"><span class="nav-number">3.8.</span> <span class="nav-text">Retention Policy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Continuous-Query"><span class="nav-number">3.9.</span> <span class="nav-text">Continuous Query</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shard"><span class="nav-number">3.10.</span> <span class="nav-text">Shard</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储引擎"><span class="nav-number">4.</span> <span class="nav-text">存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">4.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache"><span class="nav-number">4.2.</span> <span class="nav-text">Cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WAL"><span class="nav-number">4.3.</span> <span class="nav-text">WAL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TSM-File"><span class="nav-number">4.4.</span> <span class="nav-text">TSM File</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Compactor"><span class="nav-number">4.5.</span> <span class="nav-text">Compactor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录结构"><span class="nav-number">5.</span> <span class="nav-text">目录结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实践"><span class="nav-number">6.</span> <span class="nav-text">实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#项目介绍"><span class="nav-number">6.1.</span> <span class="nav-text">项目介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#前期架构图"><span class="nav-number">6.2.</span> <span class="nav-text">前期架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用问题"><span class="nav-number">6.3.</span> <span class="nav-text">使用问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#踩过的坑"><span class="nav-number">6.4.</span> <span class="nav-text">踩过的坑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化后的架构图"><span class="nav-number">6.5.</span> <span class="nav-text">优化后的架构图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据聚合"><span class="nav-number">7.</span> <span class="nav-text">数据聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CQ"><span class="nav-number">7.1.</span> <span class="nav-text">CQ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark"><span class="nav-number">7.2.</span> <span class="nav-text">Spark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

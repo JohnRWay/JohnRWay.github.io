@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文主要以2B2B平台为例对尝试着对支付绑定、支付解绑、在线支付、退款等业务流程及设计方式进行说明、梳理。设计策略：在做支付业务设计的时候，不光要分析业务流程还要考虑设计策略，关于支付业务的设计策略主要体现在数据安全性和扩展性。 1、数据安全性采用银联签名机制、加密机制确保支付过程中支付的安全性。 报文签名与验签机制的共同点：首先都需要对报文中出现签名域（signature）之外的所有数据元采用k">
+<meta name="keywords" content="支付类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="支付业务设计">
+<meta property="og:url" content="http://yoursite.com/2019/03/24/finaPayFlow/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="本文主要以2B2B平台为例对尝试着对支付绑定、支付解绑、在线支付、退款等业务流程及设计方式进行说明、梳理。设计策略：在做支付业务设计的时候，不光要分析业务流程还要考虑设计策略，关于支付业务的设计策略主要体现在数据安全性和扩展性。 1、数据安全性采用银联签名机制、加密机制确保支付过程中支付的安全性。 报文签名与验签机制的共同点：首先都需要对报文中出现签名域（signature）之外的所有数据元采用k">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/payment.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/cardbind.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/cardunbind.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/UPpayFlow.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/headpayment.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/backpayment.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/24/finaPayFlow/refund.png">
+<meta property="og:updated_time" content="2019-03-24T10:15:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="支付业务设计">
+<meta name="twitter:description" content="本文主要以2B2B平台为例对尝试着对支付绑定、支付解绑、在线支付、退款等业务流程及设计方式进行说明、梳理。设计策略：在做支付业务设计的时候，不光要分析业务流程还要考虑设计策略，关于支付业务的设计策略主要体现在数据安全性和扩展性。 1、数据安全性采用银联签名机制、加密机制确保支付过程中支付的安全性。 报文签名与验签机制的共同点：首先都需要对报文中出现签名域（signature）之外的所有数据元采用k">
+<meta name="twitter:image" content="http://yoursite.com/2019/03/24/finaPayFlow/payment.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/24/finaPayFlow/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>支付业务设计 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/24/finaPayFlow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">支付业务设计
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-24 17:19:23 / Modified: 18:15:44" itemprop="dateCreated datePublished" datetime="2019-03-24T17:19:23+08:00">2019-03-24</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/金融业务/" itemprop="url" rel="index"><span itemprop="name">金融业务</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要以2B2B平台为例对尝试着对支付绑定、支付解绑、在线支付、退款等业务流程及设计方式进行说明、梳理。<br>设计策略：在做支付业务设计的时候，不光要分析业务流程还要考虑设计策略，关于支付业务的设计策略主要体现在数据安全性和扩展性。</p>
+<p><strong>1、数据安全性</strong><br>采用银联签名机制、加密机制确保支付过程中支付的安全性。</p>
+<p><strong>报文签名与验签机制的共同点</strong>：首先都需要对报文中出现签名域（signature）之外的所有数据元采用key=value的形式按照名称排序，然后以&amp;作为连接符拼接成待签名串。其次，对待签名串使用SHA-1算法做摘要。</p>
+<p><strong>报文签名机制与验签机制不同点</strong>：<br>==&gt;报文的签名处理机制如下：使用银联颁发给商户的商户RSA私钥证书对摘要做签名。最后，对签名做Base64编码，将编码后的签名串放在签名（signature）表单域里和其他表单域一起通过HTTP Post的方式传输给银联在线支付平台。<br>==&gt;报文的验签处理机制如下：使用商户入网时银联提供的银联在线支付通讯RSA公钥证书对摘要做签名。最后，对签名做Base64编码，与返回报文表单中的签名（signature）域签名串做比较，如一致则验签成功，否则验签失败。</p>
+<p><strong>加密机制</strong>：对于持卡人密码银联在线支付平台使用RSA公钥证书对ANSI X9.8带主帐号格式的PIN加密并做Base64编码后传输，以保障密码的安全性。<br>依据商户可选配置，对于CVN2、有效期、卡号使用RSA公钥证书分别做加密并Base64处理。<br>对于敏感信息银行卡验证信息及身份信息部分内容，采用Base64编码后传输，以做数据屏蔽。<br>对于文件内容，使用DEFLATE压缩算法压缩后，Base64编码的方式传输，压缩编码后的内容参与签名摘要运算。</p>
+<p><strong>2、程序扩展性</strong></p>
+<p>在支付业务分析设计后，其相关数据库表包括支付记录表 支付记录表支付银行表 支付绑定表 支付异常表、支付订单表；以后再有类似的在线银联支付业务可以直接进行复用，不用新建表。<br>此外以下业务流程设计也可以进行扩展使用。</p>
+<p><strong>支付业务流程设计</strong><br>首先介绍整个业务的整体业务流程、资金流业务流程。其次分别介绍支付绑定、解绑、支付、退款等业务流程的设计。</p>
+<p><strong>1、支付业务整体流程图</strong><br><img src="/2019/03/24/finaPayFlow/payment.png" alt="img"> </p>
+<p><strong>2、支付业务资金流顺序图</strong><br>参考以上流程图资金流。</p>
+<p><strong>3、银行卡绑定业务顺序图</strong><br><strong>绑定业务：首先要建立绑定关系</strong></p>
+<p>建立绑定关系，指商户/收单机构的用户号（即报文中的绑定标识号）与用户的银联卡信息进行关联，关联信息留存在银联系统中。<br>建立绑定关系可分为前台模式和后台模式，前台模式时，用户在银联页面输入相关银行卡信息；后台模式由商户采集银行卡信息发送至银联进行绑定。下面以前台模式为例进行说明，业务流程图如下所示：<br><img src="/2019/03/24/finaPayFlow/cardbind.png" alt="img"> </p>
+<p>流程说明：<br>        如果采购方没有绑定过银行卡，会提示“请先绑定银行开再支付”；如果绑定过银行卡，会跳转至支付页面；<br>        在绑定银行卡页面，如果第一次绑定银行卡，绑定信息中会进行“交易平台支付密码”新增操作，否则无此操作，一个采购方只能有一个“交易平台支付密码”，可在会员中心修改此支付密码；<br>        在银联绑定卡页面，可选择储蓄卡和信用卡，点击“绑定”，跳转至银联绑定页面，输入卡号等绑定信息，绑定成功后会跳转到平台页面，绑定成功的卡可进行解绑。<br>        绑定卡以后，可进行支付，在支付页面，选择一张绑定银行卡，输入手机验证码和“交易平台支付密码”，支付点击“支付”，支付成功会跳转至支付成功页面，订单列表中可看到支付成功后订单信息。<br>        在已付款订单列表页，可对当天清算前订单进行退款，点击“退款”，会返回退款结果；如果订单支付成功，配送商（销售）可进行接单；采购方在配送商（销售）接单后可进行“确认收货”操作；</p>
+<p>确认收货后，在第二天配送商（销售）可收到相应款项，如果订单开具发票，则款项打至对公账号，如果不开具发票，则款项打至对私账号。</p>
+<p><strong>4、银行卡解绑业务流程图</strong><br><img src="/2019/03/24/finaPayFlow/cardunbind.png" alt="img"> </p>
+<p>银行卡解绑业务实际上是与银行卡绑定业务相对的业务，其业务流程非常相似。</p>
+<p><strong>5、银行卡在线支付业务流程图</strong></p>
+<p>一般交易平台支付有四个触发场景：购物车支付、直接购买支付、快速购买支付、订单列表支付。</p>
+<p>触发支付操作后，根据是否开具发票来判断调用哪种类型的支付接口，如果开具发票且是增值税发票，调用B2B支付接口（前台交易），如果未开具发票或开具普通发票，调用绑定支付接口，支付之前必须先绑定银行卡，<br>如果是借记卡，调用借记卡绑定接口，之后调用绑定代收接口，如果是贷记卡，则调用贷记卡绑定接口，之后调用绑定消费接口。<br><img src="/2019/03/24/finaPayFlow/UPpayFlow.png" alt="img"> </p>
+<p>从技术实现方式上交易大致可划分为前台类交易、后台类交易</p>
+<p>前台类交易是指交易请求方（如商户、收单机构）与银联在线支付系统之间的交易信息通过用户浏览器进行传递的交易，是一种异步的、需要持卡人参与完成的交易类型。<br>对于涉及金额的前台类交易（即交易请求中有金额字段）银联在线支付系统系统均会给请求方后台通知(后台通知报文要素同前台应答的要素)，请求方也必须实现接收后台通知。<br>对于交易状态未知的交易请求方必须发起交易状态查询交易。<br><img src="/2019/03/24/finaPayFlow/headpayment.png" alt="img"> </p>
+<p>后台类交易是指交易请求方（如商户、收单机构）将交易信息直接通过请求方服务器发送至银联在线支付系统服务器的交易方式。<br>后台交易均为同步短连接方式，不需要持卡人参与完成的交易类型。<br>对于涉及金额的后台类交易，若通讯超时，则交易请求方必须发起交易状态查询交易。<br><img src="/2019/03/24/finaPayFlow/backpayment.png" alt="img"> </p>
+<p><strong>6、银行卡退款业务流程图</strong><br>银行在线退款业务根据业务需求设计如下业务规则：<br>==&gt;整单整退（子订单不能单独退款，只能大订单进行退款）<br>==&gt;当天晚上11点前的订单，在11点后不可以进行线上退款。</p>
+<p>已发货订单和交易完成订单不能线上退款，只能线下退款<br><img src="/2019/03/24/finaPayFlow/refund.png" alt="img"> </p>
+<p><strong>7、整体接口设计</strong></p>
+<p><strong>8、支付开发设计</strong><br><strong>8.1前台交易开发步骤</strong><br>==&gt;以表单的方式组装要发送给银联在线支付的数据对象（包括订单号、商户号、交易类型、交易金额、交易时间等各域）。每个域填写方法可参考文档《中国银联在线支付平台-商户接入接口规范》。<br>==&gt;将组装好的数据排序好并用&amp;连接后签名，生成signature字段，可使用插件包提供的方法“sign(未签名报文, 报文字符集);”。可通过调用插件包提供的签名方法来完成签名。<br>==&gt;把所有要发送给银联在线支付的域包括signature和signMethod，组成表单以POST方式送给银联在线支付前台交易的地址。<br>==&gt;交易完成后，银联在线支付系统将把交易结果分别返回通知到商户通的前台应答地址和后台应答地址上，商户接收到交易通知后可分别调用“coverResultString2Map(应答报文);”方法进行应答报文解析，和“MpiUtil.validate(应答报文, 报文字符集)”方法进行签名验证。</p>
+<p><strong>8.2后台类交易接口开发步骤</strong><br>商户按照不同的交易组装报文，交易报文请参考<a href="https://open.unionpay.com/tjweb/api/list?bussId=52" target="_blank" rel="noopener">《中国银联在线支付平台-商户接入接口规范》</a>,<br>把组装好的数据排序好并用&amp;连接后签名，生成signature字段，可使用插件包提供的方法“sign(未签名报文, 报文字符集);”。<br>把所有数据，包括signature和signMethod用key=value并用&amp;符号链接的方式组装成字符串，通过插件包提供的方法进行发送。<br>接收到返回报文后，通过插件包提供的方法进行验证签名，调用“coverResultString2Map(应答报文);”方法进行应答报文解析，和“MpiUtil.validate(应答报文, 报文字符集)”方法进行签名验证。</p>
+<p><strong>8.3合并付款交易接口</strong><br>功能说明:合并付款是指当支付订单中包含多个商户的商品信息的时候，能一次进行合并付款，避免一单一付的情况。</p>
+<p><strong>8.4退款交易</strong><br>合并退款交易是指付款人在付款后因为某些原因想退回已付款项而触发的操作，银联交易完成后，需要向银联商务发送合并退款报文。</p>
+<p><strong>8.5当日确认收货及需要划付</strong><br>当日2B2B平台收到的确认收货或已经超过确认收货时间节点的待划付订单。银商根据收到的报文数据，按子订单中的商户编号，对此商户做资金划付。 </p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/支付类/" rel="tag"># 支付类</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/23/finaModel/" rel="next" title="金融系统三模型，交易，户账，总账">
+                <i class="fa fa-chevron-left"></i> 金融系统三模型，交易，户账，总账
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/24/Elastic-Stack/" rel="prev" title="Elastic-Stack">
+                Elastic-Stack <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

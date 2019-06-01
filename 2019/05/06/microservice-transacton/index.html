@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1 微服务的发展微服务倡导将复杂的单体应用拆分为若干个功能简单、松耦合的服务，这样可以降低开发难度、增强扩展性、便于敏捷开发。当前被越来越多的开发者推崇，很多互联网行业巨头、开源社区等都开始了微服务的讨论和实践。Hailo有160个不同服务构成，NetFlix有大约600个服务。国内方面，阿里巴巴、腾讯、360、京东、58同城等很多互联网公司都进行了微服务化实践。当前微服务的开发框架也非常多，比较">
+<meta name="keywords" content="阿里,TXC,分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入解读微服务架构下分布式事务解决方案">
+<meta property="og:url" content="http://yoursite.com/2019/05/06/microservice-transacton/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="1 微服务的发展微服务倡导将复杂的单体应用拆分为若干个功能简单、松耦合的服务，这样可以降低开发难度、增强扩展性、便于敏捷开发。当前被越来越多的开发者推崇，很多互联网行业巨头、开源社区等都开始了微服务的讨论和实践。Hailo有160个不同服务构成，NetFlix有大约600个服务。国内方面，阿里巴巴、腾讯、360、京东、58同城等很多互联网公司都进行了微服务化实践。当前微服务的开发框架也非常多，比较">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction1.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction2.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction3.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction4.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction5.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction6.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction7.jpg">
+<meta property="og:updated_time" content="2019-05-09T14:48:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入解读微服务架构下分布式事务解决方案">
+<meta name="twitter:description" content="1 微服务的发展微服务倡导将复杂的单体应用拆分为若干个功能简单、松耦合的服务，这样可以降低开发难度、增强扩展性、便于敏捷开发。当前被越来越多的开发者推崇，很多互联网行业巨头、开源社区等都开始了微服务的讨论和实践。Hailo有160个不同服务构成，NetFlix有大约600个服务。国内方面，阿里巴巴、腾讯、360、京东、58同城等很多互联网公司都进行了微服务化实践。当前微服务的开发框架也非常多，比较">
+<meta name="twitter:image" content="http://yoursite.com/2019/05/06/microservice-transacton/Transaction1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/06/microservice-transacton/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深入解读微服务架构下分布式事务解决方案 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/06/microservice-transacton/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深入解读微服务架构下分布式事务解决方案
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-06 14:36:07" itemprop="dateCreated datePublished" datetime="2019-05-06T14:36:07+08:00">2019-05-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-09 22:48:42" itemprop="dateModified" datetime="2019-05-09T22:48:42+08:00">2019-05-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/事务/" itemprop="url" rel="index"><span itemprop="name">事务</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-微服务的发展"><a href="#1-微服务的发展" class="headerlink" title="1 微服务的发展"></a>1 微服务的发展</h2><p>微服务倡导将复杂的单体应用拆分为若干个功能简单、松耦合的服务，这样可以降低开发难度、增强扩展性、便于敏捷开发。当前被越来越多的开发者推崇，很多互联网行业巨头、开源社区等都开始了微服务的讨论和实践。<br>Hailo有160个不同服务构成，NetFlix有大约600个服务。国内方面，阿里巴巴、腾讯、360、京东、58同城等很多互联网公司都进行了微服务化实践。<br>当前微服务的开发框架也非常多，比较著名的有Dubbo、SpringCloud、thrift 、grpc等。</p>
+<h2 id="2-微服务落地存在的问题"><a href="#2-微服务落地存在的问题" class="headerlink" title="2 微服务落地存在的问题"></a>2 微服务落地存在的问题</h2><p>虽然微服务现在如火如荼，但对其实践其实仍处于探索阶段。很多中小型互联网公司，鉴于经验、技术实力等问题，微服务落地比较困难。如著名架构师Chris Richardson所言，目前存在的主要困难有如下几方面：<br>1）单体应用拆分为分布式系统后，进程间的通讯机制和故障处理措施变的更加复杂。<br>2）系统微服务化后，一个看似简单的功能，内部可能需要调用多个服务并操作多个数据库实现，服务调用的分布式事务问题变的非常突出。<br>3）微服务数量众多，其测试、部署、监控等都变的更加困难。</p>
+<p>随着RPC框架的成熟，第一个问题已经逐渐得到解决。例如dubbo可以支持多种通讯协议，springcloud可以非常好的支持restful调用。对于第三个问题，随着docker、devops技术的发展以及各公有云paas平台自动化运维工具的推出，微服务的测试、部署与运维会变得越来越容易。<br>而对于第二个问题，现在还没有通用方案很好的解决微服务产生的事务问题。分布式事务已经成为微服务落地最大的阻碍，也是最具挑战性的一个技术难题。<br>为此，本文将深入和大家探讨微服务架构下，分布式事务的各种解决方案，并重点为大家解读阿里巴巴提出的分布式事务解决方案—-GTS。该方案中提到的GTS是全新一代解决微服务问题的分布式事务互联网中间件。</p>
+<h2 id="3-SOA分布式事务解决方案"><a href="#3-SOA分布式事务解决方案" class="headerlink" title="3 SOA分布式事务解决方案"></a>3 SOA分布式事务解决方案</h2><h3 id="3-1-基于XA协议的两阶段提交方案"><a href="#3-1-基于XA协议的两阶段提交方案" class="headerlink" title="3.1 基于XA协议的两阶段提交方案"></a>3.1 基于XA协议的两阶段提交方案</h3><p>交易中间件与数据库通过 XA 接口规范，使用两阶段提交来完成一个全局事务， XA 规范的基础是两阶段提交协议。<br>第一阶段是表决阶段，所有参与者都将本事务能否成功的信息反馈发给协调者；第二阶段是执行阶段，协调者根据所有参与者的反馈，通知所有参与者，步调一致地在所有分支上提交或者回滚。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction1.jpg" alt="img"><br>基于XA协议的两阶段提交方案</p>
+<p>两阶段提交方案应用非常广泛，几乎所有商业OLTP数据库都支持XA协议。但是两阶段提交方案锁定资源时间长，对性能影响很大，基本不适合解决微服务事务问题。</p>
+<h3 id="3-2-TCC方案"><a href="#3-2-TCC方案" class="headerlink" title="3.2 TCC方案"></a>3.2 TCC方案</h3><p>TCC方案在电商、金融领域落地较多。TCC方案其实是两阶段提交的一种改进。其将整个业务逻辑的每个分支显式的分成了Try、Confirm、Cancel三个操作。<br>Try部分完成业务的准备工作，confirm部分完成业务的提交，cancel部分完成事务的回滚。基本原理如下图所示。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction2.jpg" alt="img"><br>TCC方案</p>
+<p>事务开始时，业务应用会向事务协调器注册启动事务。之后业务应用会调用所有服务的try接口，完成一阶段准备。之后事务协调器会根据try接口返回情况，决定调用confirm接口或者cancel接口。如果接口调用失败，会进行重试。<br>TCC方案让应用自己定义数据库操作的粒度，使得降低锁冲突、提高吞吐量成为可能。 </p>
+<p>当然<strong>TCC方案也有不足之处，集中表现在以下两个方面</strong>：<br><strong>对应用的侵入性强。</strong>业务逻辑的每个分支都需要实现try、confirm、cancel三个操作，应用侵入性较强，改造成本高。<br><strong>实现难度较大。</strong>需要按照网络状态、系统故障等不同的失败原因实现不同的回滚策略。为了满足一致性的要求，confirm和cancel接口必须实现幂等。</p>
+<p>上述原因导致TCC方案大多被研发实力较强、有迫切需求的大公司所采用。微服务倡导服务的轻量化、易部署，而TCC方案中很多事务的处理逻辑需要应用自己编码实现，复杂且开发量大。</p>
+<h3 id="3-3-基于消息的最终一致性方案"><a href="#3-3-基于消息的最终一致性方案" class="headerlink" title="3.3 基于消息的最终一致性方案"></a>3.3 基于消息的最终一致性方案</h3><p>消息一致性方案是通过消息中间件保证上、下游应用数据操作的一致性。基本思路是将本地操作和发送消息放在一个事务中，保证本地操作和消息发送要么两者都成功或者都失败。<br>下游应用向消息系统订阅该消息，收到消息后执行相应操作。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction3.jpg" alt="img"><br>消息一致性方案</p>
+<p>消息方案从本质上讲是将分布式事务转换为两个本地事务，然后依靠下游业务的重试机制达到最终一致性。基于消息的最终一致性方案对应用侵入性也很高，应用需要进行大量业务改造，成本较高。</p>
+<h2 id="4-GTS–分布式事务解决方案"><a href="#4-GTS–分布式事务解决方案" class="headerlink" title="4 GTS–分布式事务解决方案"></a>4 GTS–分布式事务解决方案</h2><p>GTS是一款分布式事务中间件，由阿里巴巴中间件部门研发，可以为微服务架构中的分布式事务提供一站式解决方案。更多GTS资料请访问创始人<a href="https://weibo.com/jiangyu666?is_all=1" target="_blank" rel="noopener">微博</a>。</p>
+<h3 id="4-1-GTS的核心优势"><a href="#4-1-GTS的核心优势" class="headerlink" title="4.1 GTS的核心优势"></a>4.1 GTS的核心优势</h3><h4 id="性能超强"><a href="#性能超强" class="headerlink" title="性能超强"></a>性能超强</h4><p>GTS通过大量创新，解决了事务ACID特性与高性能、高可用、低侵入不可兼得的问题。单事务分支的平均响应时间在2ms左右，3台服务器组成的集群可以支撑3万TPS以上的分布式事务请求。</p>
+<h4 id="应用侵入性极低"><a href="#应用侵入性极低" class="headerlink" title="应用侵入性极低"></a>应用侵入性极低</h4><p>GTS对业务低侵入，业务代码最少只需要添加一行注解（@TxcTransaction）声明事务即可。业务与事务分离，将微服务从事务中解放出来，微服务关注于业务本身，不再需要考虑反向接口、幂等、回滚策略等复杂问题，极大降低了微服务开发的难度与工作量。</p>
+<h4 id="完整解决方案"><a href="#完整解决方案" class="headerlink" title="完整解决方案"></a>完整解决方案</h4><p>GTS支持多种主流的服务框架，包括EDAS，Dubbo，Spring Cloud等。<br>有些情况下，应用需要调用第三方系统的接口，而第三方系统没有接入GTS。此时需要用到GTS的MT模式。GTS的MT模式可以等价于TCC模式，用户可以根据自身业务需求自定义每个事务阶段的具体行为。MT模式提供了更多的灵活性，可能性，以达到特殊场景下的自定义优化及特殊功能的实现。</p>
+<h4 id="容错能力强"><a href="#容错能力强" class="headerlink" title="容错能力强"></a>容错能力强</h4><p>GTS解决了XA事务协调器单点问题，实现真正的高可用，可以保证各种异常情况下的严格数据一致。</p>
+<h3 id="4-2-GTS的应用场景"><a href="#4-2-GTS的应用场景" class="headerlink" title="4.2 GTS的应用场景"></a>4.2 GTS的应用场景</h3><p>GTS可应用在涉及服务调用的多个领域，包括但不限于金融支付、电信、电子商务、快递物流、广告营销、社交、即时通信、手游、视频、物联网、车联网等，详细介绍可以阅读 《GTS–阿里巴巴分布式事务全新解决方案》一文。</p>
+<h3 id="4-3-GTS与微服务的集成"><a href="#4-3-GTS与微服务的集成" class="headerlink" title="4.3 GTS与微服务的集成"></a>4.3 GTS与微服务的集成</h3><p>GTS包括客户端（GTS Client）、资源管理器（GTS RM）和事务协调器（GTS Server）三个部分。<br>GTS Client主要用来界定事务边界，完成事务的发起与结束。<br>GTS RM完成事务分支的创建、提交、回滚等操作。<br>GTS Server主要负责分布式事务的整体推进，事务生命周期的管理。GTS和微服务集成的结构图如下所示，GTS Client需要和业务应用集成部署，RM与微服务集成部署。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction4.jpg" alt="img"><br>GTS与微服务集成</p>
+<h3 id="4-4-GTS的输出形式"><a href="#4-4-GTS的输出形式" class="headerlink" title="4.4 GTS的输出形式"></a>4.4 GTS的输出形式</h3><p>GTS目前有三种输出形式：公有云输出、公网输出、专有云输出。</p>
+<h4 id="4-4-1-公有云输出"><a href="#4-4-1-公有云输出" class="headerlink" title="4.4.1 公有云输出"></a>4.4.1 公有云输出</h4><p>这种输出形式面向阿里云用户。如果用户的业务系统已经部署到阿里云上，可以申请开通公有云GTS。开通后业务应用即可通过GTS保证服务调用的一致性。这种使用场景下，业务系统和GTS间的网络环境比较理想，达到很好性能。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction5.jpg" alt="img"><br>公有云输出</p>
+<h4 id="4-4-2-公网输出"><a href="#4-4-2-公网输出" class="headerlink" title="4.4.2 公网输出"></a>4.4.2 公网输出</h4><p>这种输出形式面向于非阿里云的用户，使用更加方便、灵活，业务系统只要能连接互联网即可享受GTS提供的云服务（与公有云输出的差别在于客户端部署于用户本地，而不在云上）。<br>在正常网络环境下，以包含两个本地事务的全局事务为例，事务完成时间在20ms左右，50个并发就可以轻松实现1000TPS以上分布式事务，对绝大多数业务来说性能是足够的。<br>在公网环境，网络闪断很难完全避免，这种情况下GTS仍能保证服务调用的数据一致性。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction6.jpg" alt="img"><br>公网输出</p>
+<p>具体使用样例使用参见4.7节GTS的工程样例。</p>
+<h4 id="4-4-3-专有云输出"><a href="#4-4-3-专有云输出" class="headerlink" title="4.4.3 专有云输出"></a>4.4.3 专有云输出</h4><p>这种形式主要面向于已建设了自己专有云平台的大用户，GTS可以直接部署到用户的专有云上，为专有云提供分布式事务服务。目前已经有10多个特大型企业的专有云使用GTS解决分布式事务难题，性能与稳定性经过了用户的严格检测。</p>
+<h3 id="4-5-GTS的使用方式"><a href="#4-5-GTS的使用方式" class="headerlink" title="4.5 GTS的使用方式"></a>4.5 GTS的使用方式</h3><p>GTS对应用的侵入性非常低，使用也很简单。下面以订单存储应用为例说明。订单业务应用通过调用订单服务和库存服务完成订单业务，服务开发框架为Dubbo。</p>
+<h4 id="4-5-1-订单业务应用"><a href="#4-5-1-订单业务应用" class="headerlink" title="4.5.1 订单业务应用"></a>4.5.1 订单业务应用</h4><p>在业务函数外围使用@TxcTransaction注解即可开启分布式事务。Dubbo应用通过隐藏参数将GTS的事务xid传播到服务端。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">@TxcTransaction(timeout = 1000 * 10)</span><br><span class="line">public void Bussiness(OrderService orderService, StockService stockService, String userId) &#123;</span><br><span class="line">    //获取事务上下文</span><br><span class="line">    String xid = TxcContext.getCurrentXid();</span><br><span class="line">    //通过RpcContext将xid传到一个服务端</span><br><span class="line">    RpcContext.getContext().setAttachment(<span class="string">"xid"</span>, xid);</span><br><span class="line">    </span><br><span class="line">    //执行自己的业务逻辑</span><br><span class="line">    int productId = new Random().nextInt(100);</span><br><span class="line">    int productNum = new Random().nextInt(100);</span><br><span class="line">    OrderDO orderDO = new OrderDO(userId, productId, productNum, </span><br><span class="line">          new Timestamp(new Date().getTime()));</span><br><span class="line">    orderService.createOrder(orderDO);</span><br><span class="line">    </span><br><span class="line">    //通过RpcContext将xid传到另一个服务端</span><br><span class="line">    RpcContext.getContext().setAttachment(<span class="string">"xid"</span>,xid);</span><br><span class="line">    stockService.updateStock(orderDO);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="4-5-2-服务提供者"><a href="#4-5-2-服务提供者" class="headerlink" title="4.5.2 服务提供者"></a>4.5.2 服务提供者</h4><p>更新库存方法<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public int updateStock(OrderDO orderDO) &#123;</span><br><span class="line">    //获取全局事务ID，并绑定到上下文</span><br><span class="line">    String xid = RpcContext.getContext().getAttachment(<span class="string">"xid"</span>);</span><br><span class="line">    TxcContext.bind(xid,null);</span><br><span class="line">    //执行自己的业务逻辑</span><br><span class="line">    String sql = <span class="string">"update stock set amount = amount - ? where product_id = ?"</span>;</span><br><span class="line">    int ret = jdbcTemplate.update(sql,new Object[]&#123;orderDO.getNumber(), </span><br><span class="line">        orderDO.getProductId()&#125;);</span><br><span class="line">    TxcContext.unbind();</span><br><span class="line">    <span class="built_in">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-6-GTS的应用情况"><a href="#4-6-GTS的应用情况" class="headerlink" title="4.6 GTS的应用情况"></a>4.6 GTS的应用情况</h3><p>GTS目前已经在淘宝、天猫、阿里影业、淘票票、阿里妈妈、1688等阿里各业务系统广泛使用，经受了16年和17年两年双十一海量请求的考验。某线上业务系统最高流量已达十万TPS（每秒钟10万笔事务）。<br>GTS在公有云和专有云输出后，已经有了100多个线上用户，很多用户通过GTS解决SpringCloud、Dubbo、Edas等服务框架的分布式事务问题。<br>业务领域涉及电力、物流、ETC、烟草、金融、零售、电商、共享出行等十几个行业，得到用户的一致认可。</p>
+<p><img src="/2019/05/06/microservice-transacton/Transaction7.jpg" alt="img"><br>GTS与springCloud集成案例</p>
+<p>上图是GTS与SpringCloud集成，应用于某共享出行系统。业务共享出行场景下，通过GTS支撑物联网系统、订单系统、支付系统、运维系统、分析系统等系各统应用的数据一致性，保证海量订单和数千万流水的交易。</p>
+<h3 id="4-7-GTS的工程样例"><a href="#4-7-GTS的工程样例" class="headerlink" title="4.7 GTS的工程样例"></a>4.7 GTS的工程样例</h3><p>GTS的公有云样例可参考阿里云网站。在公网环境下提供sample-txc-simple和sample-txc-dubbo两个样例工程。<br><strong>注意</strong><br>mysql-connector-java 的版本需要和 MySQL 数据库版本匹配。样例 pom.xml 中推荐的 5.1.38 版本已经在 5.0.55、5.6.16、5.6.21 三个 MySQL 数据库版本上运行过。<br>MySQL 数据库的库名、表名和字段名需要设置为大小写不敏感。<br>sample-txc-dubbo样例使用 Multicast 注册中心的声明方式。如果本机使用无线网络，Dubbo 服务在绑定地址时有可能获取 IPv6 地址，可以通过 JVM 启动参数禁用。方法是配置 JVM 启动参数 -Djava.net.preferIPv4Stack=true。</p>
+<h4 id="4-7-1-sample-txc-simple样例"><a href="#4-7-1-sample-txc-simple样例" class="headerlink" title="4.7.1 sample-txc-simple样例"></a>4.7.1 sample-txc-simple样例</h4><h5 id="4-7-1-1-样例业务逻辑"><a href="#4-7-1-1-样例业务逻辑" class="headerlink" title="4.7.1.1 样例业务逻辑"></a>4.7.1.1 样例业务逻辑</h5><p>该样例是GTS的入门sample，案例的业务逻辑是从A账户转账给B账户，其中A和B分别位于两个MySQL数据库中，使用GTS事务保证A和B账户钱的总数始终不变。</p>
+<h5 id="4-7-1-2-样例搭建方法"><a href="#4-7-1-2-样例搭建方法" class="headerlink" title="4.7.1.2 样例搭建方法"></a>4.7.1.2 样例搭建方法</h5><p>1.准备本地数据库环境<br>准备一台能连接公网的电脑，配置 Java 环境和 Maven 环境。<br>安装 MySQL 数据库软件，并创建两个数据库 db1 和 db2。<br>在 db1 和 db2 中分别创建 txc_undo_log 表。<br>在 db1 库中创建 user_money_a 表，在 db2 库中创建 user_money_b 表</p>
+<p>2.下载样例<br>将sample-txc-simple(点击下载)文件下载到本地，样例中已经包含了GTS的SDK。</p>
+<p>3.修改配置<br>3.1数据源配置：<br>打开sample-txc-simple/src/main/resources目录下的txc-client-context.xml，将数据源的url、username、password修改为实际值。<br>3.2scanner配置<br>将 txc-client-context.xml 中的 scanner 配置修改为:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean class=<span class="string">"com.taobao.txc.client.aop.TxcTransactionScaner"</span>&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"myapp"</span>/&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"txc_test_public.1129361738553704.QD"</span>/&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"1"</span> /&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"https://test-cs-gts.aliyuncs.com"</span> /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure></p>
+<p>4.编译样例<br>4.1Mac OS 或 Linux 系统<br>在 sample-txc-simple 目录下执行 build.sh 命令。<br>4.2Windows 系统<br>在 sample-txc-simple 目录下执行 build.bat 命令。</p>
+<p>5.运行样例<br>5.1Mac OS 或 Linux 系统<br>在 txc-yun-sample/sample-txc-simple/client/bin 目录下执行 run.sh 命令。<br>5.2Windows 系统<br>启动 cmd.exe，在 txc-yun-sample/sample-txc-simple/client/bin 目录下执行 start.bat 命令。</p>
+<h4 id="4-7-2-sample-txc-dubbo-样例"><a href="#4-7-2-sample-txc-dubbo-样例" class="headerlink" title="4.7.2 sample-txc-dubbo 样例"></a>4.7.2 sample-txc-dubbo 样例</h4><h5 id="4-7-2-1-样例业务逻辑"><a href="#4-7-2-1-样例业务逻辑" class="headerlink" title="4.7.2.1 样例业务逻辑"></a>4.7.2.1 样例业务逻辑</h5><p>本案例模拟了用户下订单、减库存的业务逻辑。客户端（Client）通过调用订单服务（OrderService）创建订单，之后通过调用库存服务（StockService）扣库存。其中订单服务读写订单数据库，库存服务读写库存数据库。由 GTS 保证跨服务事务的一致性。</p>
+<h5 id="4-7-2-2-样例搭建方法"><a href="#4-7-2-2-样例搭建方法" class="headerlink" title="4.7.2.2 样例搭建方法"></a>4.7.2.2 样例搭建方法</h5><p>1.准备数据库环境<br>安装MySQL，创建两个数据库db1和db2。在db1和db2中分别创建txc_undo_log表。在db1库中创建orders表，在db2库中创建stock表。</p>
+<p>2.下载样例<br>将样例文件(点击下载)下载到本地机器，样例中已经包含了GTS的SDK。</p>
+<p>3.修改配置<br>3.1数据源配置<br>打开sample-txc-dubbo/src/main/resources目录，将dubbo-order-service.xml、dubbo-stock-service.xml两个文件中数据源的url、username、password修改为实际值。<br>3.2scanner配置<br>将 resource 目录下的每个 xml 文件中的 scanner 配置修改为:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean class=<span class="string">"com.taobao.txc.client.aop.TxcTransactionScaner"</span>&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"myapp"</span>/&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"txc_test_public.1129361738553704.QD"</span>/&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"1"</span> /&gt;</span><br><span class="line">&lt;constructor-arg value=<span class="string">"https://test-cs-gts.aliyuncs.com"</span> /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure></p>
+<p>4.编译样例<br>4.1 Mac OS 或 Linux 系统<br>在 sample-txc-dubbo 目录下执行 build.sh 命令。<br>4.2 Windows 系统<br>在 sample-txc-dubbo 目录下执行 build.bat 命令。</p>
+<p>5.运行样例<br>5.1 Mac OS 或 Linux 系统<br>在 txc-yun-sample/sample-txc-dubbo 目录下执行 run.sh 命令。<br>该脚本会依次启动 order_run.sh(订单服务)、stock_run.sh(库存服务)和 client_run.sh(客户端程序)。<br>5.2 Windows 系统<br>启动 cmd.exe，进入 txc-yun-sample/sample-txc-dubbo/client/bin 目录。<br>执行 order.bat 命令，运行订单服务。<br>执行 stock.bat 命令，运行库存服务。<br>订单服务和库存服务都启动成功后，执行 client.bat 命令， 运行客户端程序。</p>
+<h4 id="4-7-3-SQL"><a href="#4-7-3-SQL" class="headerlink" title="4.7.3 SQL"></a>4.7.3 SQL</h4><h5 id="4-7-3-1-建表-txc-undo-log"><a href="#4-7-3-1-建表-txc-undo-log" class="headerlink" title="4.7.3.1 建表 txc_undo_log"></a>4.7.3.1 建表 txc_undo_log</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE txc_undo_log (</span><br><span class="line">id bigint(20) NOT NULL AUTO_INCREMENT COMMENT <span class="string">'主键'</span>,</span><br><span class="line">gmt_create datetime NOT NULL COMMENT <span class="string">'创建时间'</span>,</span><br><span class="line">gmt_modified datetime NOT NULL COMMENT <span class="string">'修改时间'</span>,</span><br><span class="line">xid varchar(100) NOT NULL COMMENT <span class="string">'全局事务ID'</span>,</span><br><span class="line">branch_id bigint(20) NOT NULL COMMENT <span class="string">'分支事务ID'</span>,</span><br><span class="line">rollback_info longblob NOT NULL COMMENT <span class="string">'LOG'</span>,</span><br><span class="line">status int(11) NOT NULL COMMENT <span class="string">'状态'</span>,</span><br><span class="line">server varchar(32) NOT NULL COMMENT <span class="string">'分支所在DB IP'</span>,</span><br><span class="line">PRIMARY KEY (id),</span><br><span class="line">KEY unionkey (xid,branch_id)</span><br><span class="line">) ENGINE=InnoDB AUTO_INCREMENT=211225994 DEFAULT CHARSET=utf8 COMMENT=<span class="string">'事务日志表'</span>;</span><br></pre></td></tr></table></figure>
+<h5 id="4-7-3-2-建表-user-money-a"><a href="#4-7-3-2-建表-user-money-a" class="headerlink" title="4.7.3.2 建表 user_money_a"></a>4.7.3.2 建表 user_money_a</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE user_money_a (</span><br><span class="line">id int(11) NOT NULL AUTO_INCREMENT,</span><br><span class="line">money int(11) DEFAULT NULL,</span><br><span class="line">PRIMARY KEY (id)</span><br><span class="line">) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<h5 id="4-7-3-3-建表-user-money-b"><a href="#4-7-3-3-建表-user-money-b" class="headerlink" title="4.7.3.3 建表 user_money_b"></a>4.7.3.3 建表 user_money_b</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE user_money_b (</span><br><span class="line">id int(11) NOT NULL AUTO_INCREMENT,</span><br><span class="line">money int(11) DEFAULT NULL,</span><br><span class="line">PRIMARY KEY (id)</span><br><span class="line">) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<h5 id="4-7-3-4-建表-orders"><a href="#4-7-3-4-建表-orders" class="headerlink" title="4.7.3.4 建表 orders"></a>4.7.3.4 建表 orders</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE orders (</span><br><span class="line">id bigint(20) NOT NULL AUTO_INCREMENT,</span><br><span class="line">user_id varchar(255) NOT NULL,</span><br><span class="line">product_id int(11) NOT NULL,</span><br><span class="line">number int(11) NOT NULL,</span><br><span class="line">gmt_create timestamp NOT NULL,</span><br><span class="line">PRIMARY KEY (id)</span><br><span class="line">) ENGINE=MyISAM AUTO_INCREMENT=351 DEFAULT CHARSET=utf8</span><br></pre></td></tr></table></figure>
+<h5 id="4-7-3-5-建表-stock"><a href="#4-7-3-5-建表-stock" class="headerlink" title="4.7.3.5 建表 stock"></a>4.7.3.5 建表 stock</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE stock (</span><br><span class="line">product_id int(11) NOT NULL,</span><br><span class="line">price <span class="built_in">float</span> NOT NULL,</span><br><span class="line">amount int(11) NOT NULL,</span><br><span class="line">PRIMARY KEY (product_id)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8</span><br></pre></td></tr></table></figure>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/阿里/" rel="tag"># 阿里</a>
+          
+            <a href="/tags/TXC/" rel="tag"># TXC</a>
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/04/Solution-of-Distributed-Transaction/" rel="next" title="分布式事务的解决方案">
+                <i class="fa fa-chevron-left"></i> 分布式事务的解决方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/06/service-concept-diff/" rel="prev" title="分布式，集群，SOA，微服务的区别与联系">
+                分布式，集群，SOA，微服务的区别与联系 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-微服务的发展"><span class="nav-number">1.</span> <span class="nav-text">1 微服务的发展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-微服务落地存在的问题"><span class="nav-number">2.</span> <span class="nav-text">2 微服务落地存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SOA分布式事务解决方案"><span class="nav-number">3.</span> <span class="nav-text">3 SOA分布式事务解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-基于XA协议的两阶段提交方案"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 基于XA协议的两阶段提交方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-TCC方案"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 TCC方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-基于消息的最终一致性方案"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 基于消息的最终一致性方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-GTS–分布式事务解决方案"><span class="nav-number">4.</span> <span class="nav-text">4 GTS–分布式事务解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-GTS的核心优势"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 GTS的核心优势</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#性能超强"><span class="nav-number">4.1.1.</span> <span class="nav-text">性能超强</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用侵入性极低"><span class="nav-number">4.1.2.</span> <span class="nav-text">应用侵入性极低</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完整解决方案"><span class="nav-number">4.1.3.</span> <span class="nav-text">完整解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#容错能力强"><span class="nav-number">4.1.4.</span> <span class="nav-text">容错能力强</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-GTS的应用场景"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 GTS的应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-GTS与微服务的集成"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 GTS与微服务的集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-GTS的输出形式"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 GTS的输出形式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-1-公有云输出"><span class="nav-number">4.4.1.</span> <span class="nav-text">4.4.1 公有云输出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-2-公网输出"><span class="nav-number">4.4.2.</span> <span class="nav-text">4.4.2 公网输出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-3-专有云输出"><span class="nav-number">4.4.3.</span> <span class="nav-text">4.4.3 专有云输出</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-GTS的使用方式"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 GTS的使用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-5-1-订单业务应用"><span class="nav-number">4.5.1.</span> <span class="nav-text">4.5.1 订单业务应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-5-2-服务提供者"><span class="nav-number">4.5.2.</span> <span class="nav-text">4.5.2 服务提供者</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-GTS的应用情况"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 GTS的应用情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-GTS的工程样例"><span class="nav-number">4.7.</span> <span class="nav-text">4.7 GTS的工程样例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-7-1-sample-txc-simple样例"><span class="nav-number">4.7.1.</span> <span class="nav-text">4.7.1 sample-txc-simple样例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-1-1-样例业务逻辑"><span class="nav-number">4.7.1.1.</span> <span class="nav-text">4.7.1.1 样例业务逻辑</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-1-2-样例搭建方法"><span class="nav-number">4.7.1.2.</span> <span class="nav-text">4.7.1.2 样例搭建方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-7-2-sample-txc-dubbo-样例"><span class="nav-number">4.7.2.</span> <span class="nav-text">4.7.2 sample-txc-dubbo 样例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-2-1-样例业务逻辑"><span class="nav-number">4.7.2.1.</span> <span class="nav-text">4.7.2.1 样例业务逻辑</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-2-2-样例搭建方法"><span class="nav-number">4.7.2.2.</span> <span class="nav-text">4.7.2.2 样例搭建方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-7-3-SQL"><span class="nav-number">4.7.3.</span> <span class="nav-text">4.7.3 SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-3-1-建表-txc-undo-log"><span class="nav-number">4.7.3.1.</span> <span class="nav-text">4.7.3.1 建表 txc_undo_log</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-3-2-建表-user-money-a"><span class="nav-number">4.7.3.2.</span> <span class="nav-text">4.7.3.2 建表 user_money_a</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-3-3-建表-user-money-b"><span class="nav-number">4.7.3.3.</span> <span class="nav-text">4.7.3.3 建表 user_money_b</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-3-4-建表-orders"><span class="nav-number">4.7.3.4.</span> <span class="nav-text">4.7.3.4 建表 orders</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-3-5-建表-stock"><span class="nav-number">4.7.3.5.</span> <span class="nav-text">4.7.3.5 建表 stock</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

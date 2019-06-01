@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="收集了一些阿里面试题，以后也会逐步更新这些面试题。并会慢慢的提供这些面试题的答案，请关注哦！ 一：阿里技术一面(基础掌握牢固)常用的异常类型?  session  java锁  gc原理  hashmap  listlink arraylist 区别  aop 原理  多线程  kafka 原理和容错  spark hadoop 原理  redis 同步机制  classLoader 机制  Ht">
+<meta name="keywords" content="面试,阿里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="史上最全阿里技术面试题目">
+<meta property="og:url" content="http://yoursite.com/2019/03/29/aliinterview/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="收集了一些阿里面试题，以后也会逐步更新这些面试题。并会慢慢的提供这些面试题的答案，请关注哦！ 一：阿里技术一面(基础掌握牢固)常用的异常类型?  session  java锁  gc原理  hashmap  listlink arraylist 区别  aop 原理  多线程  kafka 原理和容错  spark hadoop 原理  redis 同步机制  classLoader 机制  Ht">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-04-03T09:01:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="史上最全阿里技术面试题目">
+<meta name="twitter:description" content="收集了一些阿里面试题，以后也会逐步更新这些面试题。并会慢慢的提供这些面试题的答案，请关注哦！ 一：阿里技术一面(基础掌握牢固)常用的异常类型?  session  java锁  gc原理  hashmap  listlink arraylist 区别  aop 原理  多线程  kafka 原理和容错  spark hadoop 原理  redis 同步机制  classLoader 机制  Ht">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/29/aliinterview/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>史上最全阿里技术面试题目 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/aliinterview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">史上最全阿里技术面试题目
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-29 20:53:49" itemprop="dateCreated datePublished" datetime="2019-03-29T20:53:49+08:00">2019-03-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-03 17:01:43" itemprop="dateModified" datetime="2019-04-03T17:01:43+08:00">2019-04-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/阿里面试/" itemprop="url" rel="index"><span itemprop="name">阿里面试</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>收集了一些阿里面试题，以后也会逐步更新这些面试题。<br>并会慢慢的提供这些面试题的答案，请关注哦！</p>
+<h3 id="一：阿里技术一面-基础掌握牢固"><a href="#一：阿里技术一面-基础掌握牢固" class="headerlink" title="一：阿里技术一面(基础掌握牢固)"></a>一：阿里技术一面(基础掌握牢固)</h3><pre><code>常用的异常类型?
+ session
+ java锁
+ gc原理
+ hashmap
+ listlink arraylist 区别
+ aop 原理
+ 多线程
+ kafka 原理和容错
+ spark hadoop 原理
+ redis 同步机制
+ classLoader 机制
+ Http 协议
+ cookie的限制
+ 如何设计一个分步式登录系统？
+ Spring加载过程？
+ 自己有没有写过类似Spring这样的AOP事务？
+ spring的加载过程？
+ atomic 与 volatile的区别？
+ Thread的 notify()给notifyAll()的区别?
+ notifiy()是唤醒的那一个线程?
+ Thread.sleep()唤醒以后是否需要重新竞争？
+ 单例有多少种写法? 有什么区别? 你常用哪一种单例，为什么用这种？
+ 问一个Thread.join()相关的问题?
+ 写一个JAVA死锁的列子?
+ 如何解决死锁?
+ GC回收算法,及实现原理?
+ HashMap数据存储结构? key重复了怎么办? 是如何解决的?
+ Spring AOP的实现原理，底层用什么实现的？
+ Java的线程池说一下，各个参数的作用，如何进行的?
+同步与异步区别？
+ HashMap的实现原理，HashMap是如何解决hash冲突的问题？
+ Redis讲一下，项目使用场景，以及对应的算法？
+ 分布式系统的全局id如何实现？用zookeeper如何实现的呢，机器号+时间戳即可？
+ 分布式锁的方案，redis和zookeeper那个好，如果是集群部署，高并发情况下哪个性能更好？
+ kafka了解么，了解哪些消息队列？
+ 乐观锁，悲观锁?
+ IO和NIO的却别，以及NIO的原理，有了解过mina？
+ JVM内存模型，JVM加载原理，回收算法了解？
+</code></pre><h3 id="阿里技术二面-技术原理、个人擅长的项目"><a href="#阿里技术二面-技术原理、个人擅长的项目" class="headerlink" title="阿里技术二面(技术原理、个人擅长的项目)"></a>阿里技术二面(技术原理、个人擅长的项目)</h3><pre><code>重点是面试技术原理，以及对技术的热情和专研程度：
+Java的高级知识
+ 开源框架的原理
+ JVM
+ 多线程
+ 高并发
+ 中间件
+ 之前项目经历，运用的技术，遇到的问题，如何解决，个人有什么收获和成长；
+ 对于技术的热情（平时是否看些技术书籍，逛论坛，写博客，写源代码或程序等）；
+ 介绍你做的项目和其中的难点？
+反射的作用是什么？
+数据仓库，多线程和并发工具等？
+私有云，docker和k8s等？
+了解哪些中间件，dubbo，rocketmq，mycat等？
+dubbo中的rpc如何实现？
+自己实现rpc应该怎么做？
+dubbo的服务注册与发现？
+听说我是非科班，于是问了些排序算法
+</code></pre><h3 id="阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。"><a href="#阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。" class="headerlink" title="阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。"></a>阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。</h3><pre><code>大概说一下就是有几个考点：
+Java并发的知识点
+ 集合类
+ 线程池
+ 多线程之间的通信
+ 面试耗时将近40分钟。
+</code></pre><h3 id="阿里HR面："><a href="#阿里HR面：" class="headerlink" title="阿里HR面："></a>阿里HR面：</h3><pre><code>聊人生谈理想，主要还是考察你对工作是否持积极的态度，以及你是否稳定,自信发挥就可以了。
+面试耗时将近30分钟。
+</code></pre><h4 id="JAVA开发技术面试可能问到的问题？"><a href="#JAVA开发技术面试可能问到的问题？" class="headerlink" title="JAVA开发技术面试可能问到的问题？"></a>JAVA开发技术面试可能问到的问题？</h4><pre><code>我们主要考核的是网络nio 分布式数据库高并发大数据
+自定义表格的实现?
+动态表单设计?
+in-jvm（必考）以及jmm缓存模型如何调优?
+常用的RPC框架
+nio和io
+并发编程，设计模式
+地图组件?
+hashmap有什么漏洞会导致他变慢？
+如何给hashmap的key对象设计他的hashcode？
+泛型通配符?在什么情况下使用？
+后端方面：redis?分布式框架dubbo(阿里巴巴开源框架)?设计模式?
+场景式的问题:秒杀,能列出常见的排队、验证码、库存扣减方式对系统高并发的影响?
+能根据实际的需要构建缓存结构提高提高网站的访问速度，熟练使用ehcache、oscache，了解memcache。
+了解基于dns轮询的负载均衡，熟练配置web服务器实现负载均衡，程序级能综合使用基于hash或取模等手段实现软负载。
+熟悉分布式数据库设计和优化技术，熟练使用mysql、oracle、SqlServer等主流数据库，熟悉hadoop hbase mangodb redis ehcache、oscache memcache。对于大数据量的数据库处理采用分表分库、数据库读写分离、建立缓存等手段优化性能。
+熟练掌握lucene，能基于lucene开发大型的搜索引擎，并能用lucene来改善和优化数据库的like查询。
+</code></pre><h3 id="项目部分"><a href="#项目部分" class="headerlink" title="项目部分"></a>项目部分</h3><pre><code>缓存的使用，如果现在需要实现一个简单的缓存，供搜索框中的ajax异步请求调用，使用什么结构？
+内存中的缓存不能一直存在，用什么算法定期将搜索权重较低的entry去掉？
+TCP如何保证安全性
+红黑树的问题，B+数
+JDK1.8中对HashMap的增强，如果一个桶上的节点数量过多，链表+数组的结构就会转换为红黑树。
+项目中使用的单机服务器，如果将它部署成分布式服务器？
+MySQL的常见优化方式、定为慢查询
+手写一个线程安全的单例模式
+</code></pre><h3 id="进阿里必会知识："><a href="#进阿里必会知识：" class="headerlink" title="进阿里必会知识："></a>进阿里必会知识：</h3><pre><code> 算法和数据结构数组、链表、二叉树、队列、栈的各种操作（性能，场景）
+ 二分查找和各种变种的二分查找
+ 各类排序算法以及复杂度分析（快排、归并、堆）
+各类算法题（手写）
+ 理解并可以分析时间和空间复杂度。
+ 动态规划（笔试回回有。。）、贪心。
+ 红黑树、AVL树、Hash树、Tire树、B树、B+树。
+ 图算法（比较少，也就两个最短路径算法理解吧）
+ 计算机网络OSI7层模型（TCP4层）每层的协议
+ get/post 以及幂等性
+ http 协议头相关
+ 网络攻击（CSRF、XSS）
+ TCP/IP三次握手、四次挥手
+ TCP与UDP比较
+ DDos攻击
+ (B)IO/NIO/AIO三者原理，各个语言是怎么实现的
+ Netty
+ Linux内核select poll epoll
+ 数据库（最多的还是mysql，Nosql有redis）索引（包括分类及优化方式，失效条件，底层结构）
+ sql语法（join，union，子查询，having，group by）
+ 引擎对比（InnoDB，MyISAM）
+ 数据库的锁（行锁，表锁，页级锁，意向锁，读锁，写锁，悲观锁，乐观锁，以及加锁的select sql方式）
+ 隔离级别，依次解决的问题（脏读、不可重复读、幻读）
+ 事务的ACID
+ B树、B+树
+ 优化（explain，慢查询，show profile）
+ 数据库的范式
+分库分表，主从复制，读写分离。
+ Nosql相关（redis和memcached区别之类的，如果你熟悉redis，redis还有一堆要问的）
+ 操作系统：进程通信IPC（几种方式），与线程区别
+ OS的几种策略（页面置换，进程调度等，每个里面有几种算法）
+ 互斥与死锁相关的
+ linux常用命令（问的时候都会给具体某一个场景）
+ Linux内核相关（select、poll、epoll）
+ 编程语言（这里只说Java）：把我之后的面经过一遍，Java感觉覆盖的就差不多了，不过下面还是分个类。
+ Java基础（面向对象、四个特性、重载重写、static和final等等很多东西）
+ 集合（HashMap、ConcurrentHashMap、各种List，最好结合源码看）
+ 并发和多线程（线程池、SYNC和Lock锁机制、线程通信、volatile、ThreadLocal、CyclicBarrier、Atom包、CountDownLatch、AQS、CAS原理等等）
+ JVM（内存模型、GC垃圾回收，包括分代，GC算法，收集器、类加载和双亲委派、JVM调优，内存泄漏和内存溢出）
+ IO/NIO相关
+ 反射和代理、异常、Java8相关、序列化
+ 设计模式（常用的，jdk中有的）
+ Web相关（servlet、cookie/session、Spring)
+</code></pre><h3 id="阿里面试题目范畴："><a href="#阿里面试题目范畴：" class="headerlink" title="阿里面试题目范畴："></a>阿里面试题目范畴：</h3><pre><code>内存模型
+类加载机制
+GC
+JVM调优
+线程池原理
+动态代理
+悲观锁乐观锁
+高并发问题
+事务隔离级别
+索引原理
+限流
+分库分表
+分布式事务提交
+微服务
+dubbo原理
+</code></pre><h3 id="阿里面试总结"><a href="#阿里面试总结" class="headerlink" title="阿里面试总结"></a>阿里面试总结</h3><pre><code>阿里比较喜欢的人才特点：对技术有热情，强硬的技术基础实力；主动，善于团队协作，善于总结思考。
+技术基础以及的问题多看看书准备，不懂的直接说不懂没关系的；在项目细节上多把关一下，根据项目有针对性的谈自己的技术亮点，能表达清楚，可以引导面试官来问你比较擅长的技术问题。
+阿里的面试特别喜欢面试技术原理，特别是
+多线程
+ NIO
+ 异步消息框架
+ 分布式相关的缓存算法等
+ JVM的加载过程和原理
+ 回收算法
+ 以及具体使用过的框架，会问部分参数检验你是否熟用
+ 第一面能通过，后续被录用的可能性就比较高了，第一轮非常重要，建议系统性的学习面试题目！
+</code></pre><p>原创不易，转载请注明出处。<br>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/面试/" rel="tag"># 面试</a>
+          
+            <a href="/tags/阿里/" rel="tag"># 阿里</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/28/back-optimal/" rel="next" title="后端优化的几种方式--缓存化，异步化，服务化">
+                <i class="fa fa-chevron-left"></i> 后端优化的几种方式--缓存化，异步化，服务化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/29/applicationoptimal/" rel="prev" title="应用后端+移动端的性能优化指标，以及性能优化方法">
+                应用后端+移动端的性能优化指标，以及性能优化方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一：阿里技术一面-基础掌握牢固"><span class="nav-number">1.</span> <span class="nav-text">一：阿里技术一面(基础掌握牢固)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里技术二面-技术原理、个人擅长的项目"><span class="nav-number">2.</span> <span class="nav-text">阿里技术二面(技术原理、个人擅长的项目)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。"><span class="nav-number">3.</span> <span class="nav-text">阿里技术三面不是面试，而是笔试，耗时三个小时，考的是Java核心的基础。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里HR面："><span class="nav-number">4.</span> <span class="nav-text">阿里HR面：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JAVA开发技术面试可能问到的问题？"><span class="nav-number">4.1.</span> <span class="nav-text">JAVA开发技术面试可能问到的问题？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目部分"><span class="nav-number">5.</span> <span class="nav-text">项目部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进阿里必会知识："><span class="nav-number">6.</span> <span class="nav-text">进阿里必会知识：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里面试题目范畴："><span class="nav-number">7.</span> <span class="nav-text">阿里面试题目范畴：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里面试总结"><span class="nav-number">8.</span> <span class="nav-text">阿里面试总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

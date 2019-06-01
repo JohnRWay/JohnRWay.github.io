@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="InfluxDB特点可以设置metric的保存时间。支持通过条件过滤以及正则表达式删除数据。支持类似 sql 的语法。可以设置数据在集群中的副本数。支持定期采样数据，写入另外的measurement，方便分粒度存储数据。 InfluxDB概念1）数据格式 Line Protocol在 InfluxDB 中，我们可以粗略的将要存入的一条数据看作一个虚拟的 key 和其对应的 value(field">
+<meta name="keywords" content="数据库,TSDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InfluxDB原理详解">
+<meta property="og:url" content="http://yoursite.com/2019/04/22/influxdb-principle/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="InfluxDB特点可以设置metric的保存时间。支持通过条件过滤以及正则表达式删除数据。支持类似 sql 的语法。可以设置数据在集群中的副本数。支持定期采样数据，写入另外的measurement，方便分粒度存储数据。 InfluxDB概念1）数据格式 Line Protocol在 InfluxDB 中，我们可以粗略的将要存入的一条数据看作一个虚拟的 key 和其对应的 value(field">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-principle1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-wal.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-tsm.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-header.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-blocks.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-index.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-index1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-offset.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-footer.png">
+<meta property="og:updated_time" content="2019-04-22T14:16:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InfluxDB原理详解">
+<meta name="twitter:description" content="InfluxDB特点可以设置metric的保存时间。支持通过条件过滤以及正则表达式删除数据。支持类似 sql 的语法。可以设置数据在集群中的副本数。支持定期采样数据，写入另外的measurement，方便分粒度存储数据。 InfluxDB概念1）数据格式 Line Protocol在 InfluxDB 中，我们可以粗略的将要存入的一条数据看作一个虚拟的 key 和其对应的 value(field">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/22/influxdb-principle/influxdb-principle1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/22/influxdb-principle/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>InfluxDB原理详解 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/22/influxdb-principle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">InfluxDB原理详解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-22 21:32:35 / Modified: 22:16:34" itemprop="dateCreated datePublished" datetime="2019-04-22T21:32:35+08:00">2019-04-22</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/influxdb/" itemprop="url" rel="index"><span itemprop="name">influxdb</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="InfluxDB特点"><a href="#InfluxDB特点" class="headerlink" title="InfluxDB特点"></a>InfluxDB特点</h2><p>可以设置metric的保存时间。<br>支持通过条件过滤以及正则表达式删除数据。<br>支持类似 sql 的语法。<br>可以设置数据在集群中的副本数。<br>支持定期采样数据，写入另外的measurement，方便分粒度存储数据。</p>
+<h2 id="InfluxDB概念"><a href="#InfluxDB概念" class="headerlink" title="InfluxDB概念"></a>InfluxDB概念</h2><h2 id="1）数据格式-Line-Protocol"><a href="#1）数据格式-Line-Protocol" class="headerlink" title="1）数据格式 Line Protocol"></a>1）数据格式 Line Protocol</h2><p>在 InfluxDB 中，我们可以粗略的将要存入的一条数据看作一个虚拟的 key 和其对应的 value(field value)，格式如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">cpu_usage,host=server01,region=us-west value=0.64 1434055562000000000</span><br><span class="line">``</span><br><span class="line">虚拟的key包括以下几个部分：**database, retention policy, measurement, tag sets, field name, timestamp。database 和 retention policy** 在上面的数据中并没有体现，通常在插入数据时在 http 请求的相应字段中指定。</span><br><span class="line"></span><br><span class="line">**database:** 数据库名，在 InfluxDB 中可以创建多个数据库，不同数据库中的数据文件是隔离存放的，存放在磁盘上的不同目录。</span><br><span class="line">**retention policy:** 存储策略，用于设置数据保留的时间，每个数据库刚开始会自动创建一个默认的存储策略 autogen，数据保留时间为永久，之后用户可以自己设置，例如保留最近2小时的数据。插入和查询数据时如果不指定存储策略，则使用默认存储策略，且默认存储策略可以修改。InfluxDB 会定期清除过期的数据。</span><br><span class="line">**measurement:** 测量指标名，例如 cpu_usage 表示 cpu 的使用率。</span><br><span class="line">**tag sets:** tags 在 InfluxDB 中会按照字典序排序，不管是 tagk 还是 tagv，只要不一致就分别属于两个 key，例如 host=server01,region=us-west 和 host=server02,region=us-west 就是两个不同的 tag <span class="built_in">set</span>。</span><br><span class="line">**field name:** 例如上面数据中的 value 就是 fieldName，InfluxDB 中支持一条数据中插入多个 fieldName，这其实是一个语法上的优化，在实际的底层存储中，是当作多条数据来存储。</span><br><span class="line">**timestamp:** 每一条数据都需要指定一个时间戳，在 TSM 存储引擎中会特殊对待，以为了优化后续的查询操作。</span><br><span class="line"></span><br><span class="line"><span class="comment">### 2）Point</span></span><br><span class="line">InfluxDB 中单条插入语句的数据结构，series + timestamp 可以用于区别一个 point，也就是说一个 point 可以有多个 field name 和 field value。</span><br><span class="line"></span><br><span class="line"><span class="comment">### 3）Series</span></span><br><span class="line">series 相当于是 InfluxDB 中一些数据的集合，在同一个 database 中，retention policy、measurement、tag sets 完全相同的数据同属于一个 series，同一个 series 的数据在物理上会按照时间顺序排列存储在一起。</span><br><span class="line">series 的 key 为 measurement + 所有 tags 的序列化字符串，这个 key 在之后会经常用到。</span><br><span class="line">代码中的结构如下：</span><br><span class="line">```bash</span><br><span class="line"><span class="built_in">type</span> Series struct &#123;</span><br><span class="line">    mu          sync.RWMutex</span><br><span class="line">    Key         string              // series key</span><br><span class="line">    Tags        map[string]string   // tags</span><br><span class="line">    id          uint64              // id</span><br><span class="line">    measurement *Measurement        // measurement</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="4）Shard"><a href="#4）Shard" class="headerlink" title="4）Shard"></a>4）Shard</h3><p>shard 在 InfluxDB 中是一个比较重要的概念，它和 retention policy 相关联。每一个存储策略下会存在许多 shard，每一个 shard 存储一个指定时间段内的数据，并且不重复，例如 7点-8点 的数据落入 shard0 中，8点-9点的数据则落入 shard1 中。每一个 shard 都对应一个底层的 tsm 存储引擎，有独立的 cache、wal、tsm file。<br>创建数据库时会自动创建一个默认存储策略，永久保存数据，对应的在此存储策略下的 shard 所保存的数据的时间段为 7 天，计算的函数如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">func shardGroupDuration(d time.Duration) time.Duration &#123;</span><br><span class="line">    <span class="keyword">if</span> d &gt;= 180*24*time.Hour || d == 0 &#123; // 6 months or 0</span><br><span class="line">        <span class="built_in">return</span> 7 * 24 * time.Hour</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> d &gt;= 2*24*time.Hour &#123; // 2 days</span><br><span class="line">        <span class="built_in">return</span> 1 * 24 * time.Hour</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> 1 * time.Hour</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果创建一个新的 retention policy 设置数据的保留时间为 1 天，则单个 shard 所存储数据的时间间隔为 1 小时，超过1个小时的数据会被存放到下一个 shard 中。</p>
+<h2 id="存储引擎-TSM-Tree"><a href="#存储引擎-TSM-Tree" class="headerlink" title="存储引擎 - TSM Tree"></a>存储引擎 - TSM Tree</h2><p>从 LevelDB（LSM Tree），到 BoltDB（mmap B+树），现在InfluxDB使用的是自己实现的 TSM Tree 的算法，类似 LSM Tree，针对 InfluxDB 的使用做了特殊优化。<br>TSM Tree 是 InfluxDB 根据实际需求在 LSM Tree 的基础上稍作修改优化而来。<br>TSM 存储引擎主要由几个部分组成： cache、wal、tsm file、compactor。<br><img src="/2019/04/22/influxdb-principle/influxdb-principle1.png" alt="img"></p>
+<h3 id="1）Shard"><a href="#1）Shard" class="headerlink" title="1）Shard"></a>1）Shard</h3><p>shard 并不能算是其中的一个组件，因为这是在 tsm 存储引擎之上的一个概念。在 InfluxDB 中按照数据的时间戳所在的范围，会去创建不同的 shard，每一个 shard 都有自己的 cache、wal、tsm file 以及 compactor，<br>这样做的目的就是为了可以通过时间来快速定位到要查询数据的相关资源，加速查询的过程，并且也让之后的批量删除数据的操作变得非常简单且高效。</p>
+<p>在 LSM Tree 中删除数据是通过给指定 key 插入一个删除标记的方式，数据并不立即删除，需要等之后对文件进行压缩合并时才会真正地将数据删除，所以删除大量数据在 LSM Tree 中是一个非常低效的操作。<br>而在 InfluxDB 中，通过 retention policy 设置数据的保留时间，当检测到一个 shard 中的数据过期后，只需要将这个 shard 的资源释放，相关文件删除即可，这样的做法使得删除过期数据变得非常高效。</p>
+<h3 id="2）Cache"><a href="#2）Cache" class="headerlink" title="2）Cache"></a>2）Cache</h3><p>cache 相当于是 LSM Tree 中的 memtable，在内存中是一个简单的 map 结构，这里的 key 为 seriesKey + 分隔符 + filedName，目前代码中的分隔符为 #!~#，entry 相当于是一个按照时间排序的存放实际值的数组，具体结构如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> Cache struct &#123;</span><br><span class="line">    commit  sync.Mutex</span><br><span class="line">    mu      sync.RWMutex</span><br><span class="line">    store   map[string]*entry</span><br><span class="line">    size    uint64              // 当前使用内存的大小</span><br><span class="line">    maxSize uint64              // 缓存最大值</span><br><span class="line"></span><br><span class="line">    // snapshots are the cache objects that are currently being written to tsm files</span><br><span class="line">    // they<span class="string">'re kept in memory while flushing so they can be queried along with the cache.</span></span><br><span class="line"><span class="string">    // they are read only and should never be modified</span></span><br><span class="line"><span class="string">    // memtable 快照，用于写入 tsm 文件，只读</span></span><br><span class="line"><span class="string">    snapshot     *Cache</span></span><br><span class="line"><span class="string">    snapshotSize uint64</span></span><br><span class="line"><span class="string">    snapshotting bool</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    // This number is the number of pending or failed WriteSnaphot attempts since the last successful one.</span></span><br><span class="line"><span class="string">    snapshotAttempts int</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    stats        *CacheStatistics</span></span><br><span class="line"><span class="string">    lastSnapshot time.Time</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>插入数据时，实际上是同时往 cache 与 wal 中写入数据，可以认为 cache 是 wal 文件中的数据在内存中的缓存。当 InfluxDB 启动时，会遍历所有的 wal 文件，重新构造 cache，这样即使系统出现故障，也不会导致数据的丢失。<br>cache 中的数据并不是无限增长的，有一个 maxSize 参数用于控制当 cache 中的数据占用多少内存后就会将数据写入 tsm 文件。<br>如果不配置的话，默认上限为 25MB，每当 cache 中的数据达到阀值后，会将当前的 cache 进行一次快照，之后清空当前 cache 中的内容，再创建一个新的 wal 文件用于写入，剩下的 wal 文件最后会被删除，快照中的数据会经过排序写入一个新的 tsm 文件中。<br>目前的 cache 的设计有一个问题，当一个快照正在被写入一个新的 tsm 文件时，当前的 cache 由于大量数据写入，又达到了阀值，此时前一次快照还没有完全写入磁盘，InfluxDB 的做法是让后续的写入操作失败，用户需要自己处理，等待恢复后继续写入数据。</p>
+<h3 id="3）WAL"><a href="#3）WAL" class="headerlink" title="3）WAL"></a>3）WAL</h3><p>wal 文件的内容与内存中的 cache 相同，其作用就是为了持久化数据，当系统崩溃后可以通过 wal 文件恢复还没有写入到 tsm 文件中的数据。<br>由于数据是被顺序插入到 wal 文件中，所以写入效率非常高。但是如果写入的数据没有按照时间顺序排列，而是以杂乱无章的方式写入，数据将会根据时间路由到不同的 shard 中，<br>每一个 shard 都有自己的 wal 文件，这样就不再是完全的顺序写入，对性能会有一定影响。看到官方社区有说后续会进行优化，只使用一个 wal 文件，而不是为每一个 shard 创建 wal 文件。<br>wal 单个文件达到一定大小后会进行分片，创建一个新的 wal 分片文件用于写入数据。</p>
+<h3 id="4）TSM-file"><a href="#4）TSM-file" class="headerlink" title="4）TSM file"></a>4）TSM file</h3><p>单个 tsm file 大小最大为 2GB，用于存放数据。<br>TSM file 使用了自己设计的格式，对查询性能以及压缩方面进行了很多优化，在后面的章节会具体说明其文件结构。</p>
+<h3 id="5）Compactor"><a href="#5）Compactor" class="headerlink" title="5）Compactor"></a>5）Compactor</h3><p>compactor 组件在后台持续运行，每隔 1 秒会检查一次是否有需要压缩合并的数据。<br>主要进行两种操作，一种是 cache 中的数据大小达到阀值后，进行快照，之后转存到一个新的 tsm 文件中。<br>另外一种就是合并当前的 tsm 文件，将多个小的 tsm 文件合并成一个，使每一个文件尽量达到单个文件的最大大小，减少文件的数量，并且一些数据的删除操作也是在这个时候完成。</p>
+<h2 id="目录与文件结构"><a href="#目录与文件结构" class="headerlink" title="目录与文件结构"></a>目录与文件结构</h2><p>InfluxDB 的数据存储主要有三个目录。<br>默认情况下是 meta, wal 以及 data 三个目录。<br>meta 用于存储数据库的一些元数据，meta 目录下有一个 meta.db 文件。<br>wal 目录存放预写日志文件，以 .wal 结尾。<br>data 目录存放实际存储的数据文件，以 .tsm 结尾。这两个目录下的结构是相似的，其基本结构如下：</p>
+<h3 id="wal目录结构"><a href="#wal目录结构" class="headerlink" title="wal目录结构"></a>wal目录结构</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-- wal</span><br><span class="line">   -- mydb</span><br><span class="line">      -- autogen</span><br><span class="line">         -- 1</span><br><span class="line">            -- _00001.wal</span><br><span class="line">         -- 2</span><br><span class="line">            -- _00035.wal</span><br><span class="line">      -- 2hours</span><br><span class="line">         -- 1</span><br><span class="line">            -- _00001.wal</span><br></pre></td></tr></table></figure>
+<h3 id="data目录结构"><a href="#data目录结构" class="headerlink" title="data目录结构"></a>data目录结构</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-- data</span><br><span class="line">   -- mydb</span><br><span class="line">      -- autogen</span><br><span class="line">         -- 1</span><br><span class="line">            -- 000000001-000000003.tsm</span><br><span class="line">         -- 2</span><br><span class="line">            -- 000000001-000000001.tsm</span><br><span class="line">      -- 2hours</span><br><span class="line">         -- 1</span><br><span class="line">            -- 000000002-000000002.tsm</span><br></pre></td></tr></table></figure>
+<p>其中 mydb 是数据库名称，autogen 和 2hours 是存储策略名称，再下一层目录中的以数字命名的目录是 shard 的 ID 值。<br>比如 autogen 存储策略下有两个 shard，ID 分别为 1 和 2，shard 存储了某一个时间段范围内的数据。再下一级的目录则为具体的文件，分别是 .wal 和 .tsm 结尾的文件。</p>
+<h3 id="1）WAL文件"><a href="#1）WAL文件" class="headerlink" title="1）WAL文件"></a>1）WAL文件</h3><p><img src="/2019/04/22/influxdb-principle/influxdb-wal.png" alt="img"><br>wal 文件中的一条数据，对应的是一个 key(measument + tags + fieldName) 下的所有 value 数据，按照时间排序。<br><strong>Type (1 byte):</strong> 表示这个条目中 value 的类型。<br><strong>Key Len (2 bytes):</strong> 指定下面一个字段 key 的长度。<br><strong>Key (N bytes):</strong> 这里的 key 为 measument + tags + fieldName。<br><strong>Count (4 bytes):</strong> 后面紧跟着的是同一个 key 下数据的个数。<br><strong>Time (8 bytes):</strong> 单个 value 的时间戳。<br><strong>Value (N bytes):</strong> value 的具体内容，其中 float64, int64, boolean 都是固定的字节数存储比较简单，通过 Type 字段知道这里 value 的字节数。string 类型比较特殊，对于 string 来说，N bytes 的 Value 部分，前面 4 字节用于存储 string 的长度，剩下的部分才是 string 的实际内容。</p>
+<h3 id="2）TSM文件"><a href="#2）TSM文件" class="headerlink" title="2）TSM文件"></a>2）TSM文件</h3><p>单个 tsm 文件的主要格式如下：<br><img src="/2019/04/22/influxdb-principle/influxdb-tsm.png" alt="img"></p>
+<p>主要分为四个部分： <strong>Header, Blocks, Index, Footer</strong>。<br>其中 Index 部分的内容会被缓存在内存中，下面详细说明一下每一个部分的数据结构。</p>
+<h4 id="Header"><a href="#Header" class="headerlink" title="Header"></a>Header</h4><p><img src="/2019/04/22/influxdb-principle/influxdb-header.png" alt="img"></p>
+<p><strong>MagicNumber (4 bytes):</strong> 用于区分是哪一个存储引擎，目前使用的 tsm1 引擎，MagicNumber 为 0x16D116D1。<br><strong>Version (1 byte):</strong> 目前是 tsm1 引擎，此值固定为 1。</p>
+<h4 id="Blocks"><a href="#Blocks" class="headerlink" title="Blocks"></a>Blocks</h4><p><img src="/2019/04/22/influxdb-principle/influxdb-blocks.png" alt="img"></p>
+<p>Blocks 内部是一些连续的 Block，block 是 InfluxDB 中的最小读取对象，每次读取操作都会读取一个 block。<br>每一个 Block 分为 CRC32 值和 Data 两部分，CRC32 值用于校验 Data 的内容是否有问题。Data 的长度记录在之后的 Index 部分中。<br>Data 中的内容根据数据类型的不同，在 InfluxDB 中会采用不同的压缩方式，float 值采用了 Gorilla float compression，而 timestamp 因为是一个递增的序列，所以实际上压缩时只需要记录时间的偏移量信息。<br>string 类型的 value 采用了 snappy 算法进行压缩。Data 的数据解压后的格式为 8 字节的时间戳以及紧跟着的 value，value 根据类型的不同，会占用不同大小的空间，其中 string 为不定长，会在数据开始处存放长度，这一点和 WAL 文件中的格式相同。<br><img src="/2019/04/22/influxdb-principle/influxdb-index.png" alt="img"></p>
+<h4 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h4><p>Index 存放的是前面 Blocks 里内容的索引。索引条目的顺序是先按照 key 的字典序排序，再按照 time 排序。InfluxDB 在做查询操作时，可以根据 Index 的信息快速定位到 tsm file 中要查询的 block 的位置。<br>这张图只展示了其中一部分，用结构体来表示的话类似下面的代码：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> BlockIndex struct &#123;</span><br><span class="line">    MinTime     int64</span><br><span class="line">    MaxTime     int64</span><br><span class="line">    Offset      int64</span><br><span class="line">    Size        uint32</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> KeyIndex struct &#123;</span><br><span class="line">    KeyLen      uint16</span><br><span class="line">    Key         string</span><br><span class="line">    Type        byte</span><br><span class="line">    Count       uint32</span><br><span class="line">    Blocks      []*BlockIndex</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> Index []*KeyIndex</span><br></pre></td></tr></table></figure></p>
+<p><strong>Key Len (2 bytes):</strong> 下面一个字段 key 的长度。<br><strong>Key (N bytes):</strong> 这里的 key 指的是 seriesKey + 分隔符 + fieldName。<br><strong>Type (1 bytes):</strong> fieldName 所对应的 fieldValue 的类型，也就是 Block 中 Data 内的数据的类型。<br><strong>Count (2 bytes):</strong> 后面紧跟着的 Blocks 索引的个数。</p>
+<p>后面四个部分是 block 的索引信息，根据 Count 中的个数会重复出现，每个 block 索引固定为 28 字节，按照时间排序。</p>
+<p><strong>Min Time (8 bytes):</strong> block 中 value 的最小时间戳。<br><strong>Max Time (8 bytes):</strong> block 中 value 的最大时间戳。<br><strong>Offset (8 bytes):</strong> block 在整个 tsm file 中的偏移量。<br><strong>Size (4 bytes):</strong> block 的大小。根据 Offset + Size 字段就可以快速读取出一个 block 中的内容。</p>
+<h4 id="间接索引"><a href="#间接索引" class="headerlink" title="间接索引"></a>间接索引</h4><p>间接索引只存在于内存中，是为了可以快速定位到一个 key 在详细索引信息中的位置而创建的，可以被用于二分查找来实现快速检索。<br><img src="/2019/04/22/influxdb-principle/influxdb-index1.png" alt="img"></p>
+<p><img src="/2019/04/22/influxdb-principle/influxdb-offset.png" alt="img"></p>
+<p>offsets 是一个数组，其中存储的值为每一个 key 在 Index 表中的位置，由于 key 的长度固定为 2字节，所以根据这个位置就可以找到该位置上对应的 key 的内容。<br>当指定一个要查询的 key 时，就可以通过二分查找，定位到其在 Index 表中的位置，再根据要查询的数据的时间进行定位，由于 KeyIndex  中的 BlockIndex 结构是定长的，所以也可以进行一次二分查找，找到要查询的数据所在的 BlockIndex 的内容，之后根据偏移量以及 block 长度就可以从 tsm 文件中快速读取出一个 block 的内容。</p>
+<h4 id="Footer"><a href="#Footer" class="headerlink" title="Footer"></a>Footer</h4><p><img src="/2019/04/22/influxdb-principle/influxdb-footer.png" alt="img"><br>tsm file 的最后8字节的内容存放了 Index 部分的起始位置在 tsm file 中的偏移量，方便将索引信息加载到内存中。</p>
+<h2 id="数据查询与索引结构"><a href="#数据查询与索引结构" class="headerlink" title="数据查询与索引结构"></a>数据查询与索引结构</h2><p>由于 LSM Tree 的原理就是通过将大量的随机写转换为顺序写，从而极大地提升了数据写入的性能，与此同时牺牲了部分读的性能。<br>TSM 存储引擎是基于 LSM Tree 开发的，所以情况类似。通常设计数据库时会采用索引文件的方式（例如 LevelDB 中的 Mainfest 文件） 或者 Bloom filter 来对 LSM Tree 这样的数据结构的读取操作进行优化。<br>InfluxDB 中采用索引的方式进行优化，主要存在两种类型的索引。</p>
+<h3 id="1）元数据索引"><a href="#1）元数据索引" class="headerlink" title="1）元数据索引"></a>1）元数据索引</h3><p>一个数据库的元数据索引通过 DatabaseIndex 这个结构体来存储，在数据库启动时，会进行初始化，从所有 shard 下的 tsm file 中加载 index 数据，获取其中所有 Measurement 以及 Series 的信息并缓存到内存中。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> DatabaseIndex struct &#123;</span><br><span class="line">    measurements map[string]*Measurement // 该数据库下所有 Measurement 对象</span><br><span class="line">    series       map[string]*Series      // 所有 Series 对象，SeriesKey = measurement + tags</span><br><span class="line">    name string // 数据库名</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个结构体中最主要存放的就是该数据下所有 Measurement 和 Series 的内容，其数据结构如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> Measurement struct &#123;</span><br><span class="line">    Name       string `json:<span class="string">"name,omitempty"</span>`</span><br><span class="line">    fieldNames map[string]struct&#123;&#125;      // 此 measurement 中的所有 filedNames</span><br><span class="line"></span><br><span class="line">    // 内存中的索引信息</span><br><span class="line">    // id 以及其对应的 series 信息，主要是为了在 seriesByTagKeyValue 中存储Id节约内存</span><br><span class="line">    seriesByID          map[uint64]*Series              // lookup table <span class="keyword">for</span> series by their id</span><br><span class="line"></span><br><span class="line">    // 根据 tagk 和 tagv 的双重索引，保存排好序的 SeriesID 数组</span><br><span class="line">    // 这个 map 用于在查询操作时，可以根据 tags 来快速过滤出要查询的所有 SeriesID，之后根据 SeriesKey 以及时间范围从文件中读取相应内容</span><br><span class="line">    seriesByTagKeyValue map[string]map[string]SeriesIDs // map from tag key to value to sorted <span class="built_in">set</span> of series ids</span><br><span class="line"></span><br><span class="line">    // 此 measurement 中所有 series 的 id，按照 id 排序</span><br><span class="line">    seriesIDs           SeriesIDs                       // sorted list of series IDs <span class="keyword">in</span> this measurement</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> Series struct &#123;</span><br><span class="line">    Key         string              // series key</span><br><span class="line">    Tags        map[string]string   // tags</span><br><span class="line">    id          uint64              // id</span><br><span class="line">    measurement *Measurement        // 所属 measurement</span><br><span class="line">    // 在哪些 shard 中存在</span><br><span class="line">    shardIDs    map[uint64]bool // shards that have this series defined</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="元数据查询"><a href="#元数据查询" class="headerlink" title="元数据查询"></a>元数据查询</h4><p>InfluxDB 支持一些特殊的查询语句（支持正则表达式匹配），可以查询一些 measurement 以及 tags 相关的数据，例如<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SHOW MEASUREMENTS</span><br><span class="line">SHOW TAG KEYS FROM <span class="string">"measurement_name"</span></span><br><span class="line">SHOW TAG VALUES FROM <span class="string">"measurement_name"</span> WITH KEY = <span class="string">"tag_key"</span></span><br></pre></td></tr></table></figure></p>
+<p>例如我们需要查询 cpu_usage 这个 measurement 上传数据的机器有哪些，一个可能的查询语句为：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW TAG VALUES FROM <span class="string">"cpu_usage"</span> WITH KEY = <span class="string">"host"</span></span><br></pre></td></tr></table></figure></p>
+<p>首先根据 measurement 可以在 DatabaseIndex.measurements 中拿到 cpu_usage 所对应的 Measurement 对象。<br>通过 Measurement.seriesByTagKeyValue 获取 tagk=host 所对应的以 tagv 为键的 map 对象。<br>遍历这个 map 对象，所有的 key 则为我们需要获取的数据。</p>
+<h4 id="普通数据查询的定位"><a href="#普通数据查询的定位" class="headerlink" title="普通数据查询的定位"></a>普通数据查询的定位</h4><p>对于普通的数据查询语句，则可以通过上述的元数据索引快速定位到要查询的数据所包含的所有 seriesKey，fieldName 和时间范围。<br>举个例子，假设查询语句为获取 server01 这台机器上 cpu_usage 指标最近一小时的数据：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT value FROM <span class="string">"cpu_usage"</span> WHERE host=<span class="string">'server01'</span> AND time &gt; now() - 1h</span><br></pre></td></tr></table></figure></p>
+<p>先根据 measurement=cpu_usage 从 DatabaseIndex.measurements 中获取到 cpu_usage 对应的 Measurement 对象。<br>之后通过 DatabaseIndex.measurements[“cpu_usage”].seriesByTagKeyValue[“host”][“server01”] 获取到所有匹配的 series 的 ID值，再通过 Measurement.seriesByID 这个 map 对象根据 series ID 获取它们的实际对象。<br>注意这里虽然只指定了 host=server01，但不代表 cpu_usage 下只有这一个 series，可能还有其他的 tags 例如 user=1 以及 user=2，这样获取到的 series ID 实际上有两个，获取数据时需要获取所有 series 下的数据。</p>
+<p>在 Series 结构体中的 shardIDs 这个 map 变量存放了哪些 shard 中存在这个 series 的数据。而 Measurement.fieldNames 这个 map 可以帮助过滤掉 fieldName 不存在的情况。<br>至此，我们在 o(1) 的时间复杂度内，获取到了所有符合要求的 series key、这些 series key 所存在的 shardID，要查询数据的时间范围，<br>之后我们就可以创建数据迭代器从不同的 shard 中获取每一个 series key 在指定时间范围内的数据。后续的查询则和 tsm file 中的 Index 的在内存中的缓存相关。</p>
+<h3 id="2）TSM-File-索引"><a href="#2）TSM-File-索引" class="headerlink" title="2）TSM File 索引"></a>2）TSM File 索引</h3><p>上文中对于 tsm file 中的 Index 部分会在内存中做间接索引，从而可以实现快速检索的目的。这里看一下具体的数据结构：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> indirectIndex struct &#123;</span><br><span class="line">    b []byte                // 下层详细索引的字节流</span><br><span class="line">    offsets []int32         // 偏移量数组，记录了一个 key 在 b 中的偏移量</span><br><span class="line">    minKey, maxKey string   </span><br><span class="line">    minTime, maxTime int64  // 此文件中的最小时间和最大时间，根据这个可以快速判断要查询的数据在此文件中是否存在，是否有必要读取这个文件</span><br><span class="line">    tombstones map[string][]TimeRange   // 用于记录哪些 key 在指定范围内的数据是已经被删除的</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>b 直接对应着 tsm file 中的 Index 部分，通过对 offsets 进行二分查找，可以获取到指定 key 的所有 block 的索引信息，之后根据 offset 和 size 信息可以取出一个指定的 block 中的所有数据。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> indexEntries struct &#123;</span><br><span class="line">    Type    byte </span><br><span class="line">    entries []IndexEntry</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> IndexEntry struct &#123;</span><br><span class="line">    // 一个 block 中的 point 都在这个最小和最大的时间范围内</span><br><span class="line">    MinTime, MaxTime int64</span><br><span class="line"></span><br><span class="line">    // block 在 tsm 文件中偏移量</span><br><span class="line">    Offset int64</span><br><span class="line"></span><br><span class="line">    // block 的具体大小</span><br><span class="line">    Size uint32</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在上一节中说明了通过元数据索引可以获取到所有 符合要求的 series key，它们对应的 shardID，时间范围。通过 tsm file 索引，我们就可以根据 series key 和 时间范围快速定位到数据在 tsm file 中的位置。</p>
+<p><strong>从 tsm file 中读取数据</strong><br>InfluxDB 中的所有数据读取操作都通过 Iterator 来完成。<br>Iterator 是一个抽象概念，并且支持嵌套，一个 Iterator 可以从底层的其他 Iterator 中获取数据并进行处理，之后再将结果传递给上层的 Iterator。<br>这部分的代码逻辑比较复杂，这里不展开说明。实际上 Iterator 底层最主要的就是通过 cursor 来获取数据。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> cursor interface &#123;</span><br><span class="line">    next() (t int64, v interface&#123;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> floatCursor interface &#123;</span><br><span class="line">    cursor</span><br><span class="line">    nextFloat() (t int64, v float64)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 底层主要是 KeyCursor，每次读取一个 block 的数据</span><br><span class="line"><span class="built_in">type</span> floatAscendingCursor struct &#123;</span><br><span class="line">    // 内存中的 value 对象</span><br><span class="line">    cache struct &#123;</span><br><span class="line">        values Values</span><br><span class="line">        pos    int</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    tsm struct &#123;</span><br><span class="line">        tdec      TimeDecoder   // 时间序列化对象</span><br><span class="line">        vdec      FloatDecoder  // value 序列化对象</span><br><span class="line">        buf       []FloatValue</span><br><span class="line">        values    []FloatValue  // 从 tsm 文件中读取到的 FloatValue 的缓存</span><br><span class="line">        pos       int</span><br><span class="line">        keyCursor *KeyCursor</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>cursor 提供了一个 next() 方法用于获取一个 value 值。每一种数据类型都有一个自己的 cursor 实现。<br>底层实现都是 KeyCursor，KeyCursor 会缓存每个 Block 的数据，通过 Next() 函数依次返回，当一个 Block 中的内容读完后再通过 ReadBlock() 函数读取下一个 Block 中的内容。</p>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/TSDB/" rel="tag"># TSDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/22/tech-Accumulation/" rel="next" title="工作中如何做好技术积累">
+                <i class="fa fa-chevron-left"></i> 工作中如何做好技术积累
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/22/guazi-practice/" rel="prev" title="瓜子云平台的实践经验">
+                瓜子云平台的实践经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#InfluxDB特点"><span class="nav-number">1.</span> <span class="nav-text">InfluxDB特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InfluxDB概念"><span class="nav-number">2.</span> <span class="nav-text">InfluxDB概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1）数据格式-Line-Protocol"><span class="nav-number">3.</span> <span class="nav-text">1）数据格式 Line Protocol</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4）Shard"><span class="nav-number">3.1.</span> <span class="nav-text">4）Shard</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储引擎-TSM-Tree"><span class="nav-number">4.</span> <span class="nav-text">存储引擎 - TSM Tree</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1）Shard"><span class="nav-number">4.1.</span> <span class="nav-text">1）Shard</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2）Cache"><span class="nav-number">4.2.</span> <span class="nav-text">2）Cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3）WAL"><span class="nav-number">4.3.</span> <span class="nav-text">3）WAL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4）TSM-file"><span class="nav-number">4.4.</span> <span class="nav-text">4）TSM file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5）Compactor"><span class="nav-number">4.5.</span> <span class="nav-text">5）Compactor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录与文件结构"><span class="nav-number">5.</span> <span class="nav-text">目录与文件结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wal目录结构"><span class="nav-number">5.1.</span> <span class="nav-text">wal目录结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data目录结构"><span class="nav-number">5.2.</span> <span class="nav-text">data目录结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1）WAL文件"><span class="nav-number">5.3.</span> <span class="nav-text">1）WAL文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2）TSM文件"><span class="nav-number">5.4.</span> <span class="nav-text">2）TSM文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Header"><span class="nav-number">5.4.1.</span> <span class="nav-text">Header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Blocks"><span class="nav-number">5.4.2.</span> <span class="nav-text">Blocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Index"><span class="nav-number">5.4.3.</span> <span class="nav-text">Index</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#间接索引"><span class="nav-number">5.4.4.</span> <span class="nav-text">间接索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Footer"><span class="nav-number">5.4.5.</span> <span class="nav-text">Footer</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据查询与索引结构"><span class="nav-number">6.</span> <span class="nav-text">数据查询与索引结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1）元数据索引"><span class="nav-number">6.1.</span> <span class="nav-text">1）元数据索引</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#元数据查询"><span class="nav-number">6.1.1.</span> <span class="nav-text">元数据查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#普通数据查询的定位"><span class="nav-number">6.1.2.</span> <span class="nav-text">普通数据查询的定位</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2）TSM-File-索引"><span class="nav-number">6.2.</span> <span class="nav-text">2）TSM File 索引</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

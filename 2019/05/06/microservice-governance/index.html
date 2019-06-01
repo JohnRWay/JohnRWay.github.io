@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="摘要：微服务平台上线后，由于采用微服务架构设计的，多个模块提供一个完整的业务流程，随着业务的发展,规模扩大，服务越来越多，需要协调线上运行的各个服务，保障服务的SLA;基于服务调用的性能KPI数据进行容量管理，合理分配各服务的资源占用;对故障业务做服务降级、流量控制、流量迁移等快速恢复业务。怎样的服务治理框架能满足需求？下面引用李林峰曾经分享的《微服务治理的技术演进和架构实践》，提供对微服务治理的">
+<meta name="keywords" content="架构实践,技术演进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大神讲解微服务治理的技术演进和架构实践">
+<meta property="og:url" content="http://yoursite.com/2019/05/06/microservice-governance/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="摘要：微服务平台上线后，由于采用微服务架构设计的，多个模块提供一个完整的业务流程，随着业务的发展,规模扩大，服务越来越多，需要协调线上运行的各个服务，保障服务的SLA;基于服务调用的性能KPI数据进行容量管理，合理分配各服务的资源占用;对故障业务做服务降级、流量控制、流量迁移等快速恢复业务。怎样的服务治理框架能满足需求？下面引用李林峰曾经分享的《微服务治理的技术演进和架构实践》，提供对微服务治理的">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction1.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction2.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction3.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction4.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction5.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction6.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction7.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction8.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction9.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction10.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction11.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction12.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction13.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction14.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction15.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction16.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction17.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction18.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction19.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction20.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction21.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction22.jpg">
+<meta property="og:updated_time" content="2019-05-12T14:03:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大神讲解微服务治理的技术演进和架构实践">
+<meta name="twitter:description" content="摘要：微服务平台上线后，由于采用微服务架构设计的，多个模块提供一个完整的业务流程，随着业务的发展,规模扩大，服务越来越多，需要协调线上运行的各个服务，保障服务的SLA;基于服务调用的性能KPI数据进行容量管理，合理分配各服务的资源占用;对故障业务做服务降级、流量控制、流量迁移等快速恢复业务。怎样的服务治理框架能满足需求？下面引用李林峰曾经分享的《微服务治理的技术演进和架构实践》，提供对微服务治理的">
+<meta name="twitter:image" content="http://yoursite.com/2019/05/06/microservice-governance/Transaction1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/06/microservice-governance/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>大神讲解微服务治理的技术演进和架构实践 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/06/microservice-governance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">大神讲解微服务治理的技术演进和架构实践
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-06 23:17:23" itemprop="dateCreated datePublished" datetime="2019-05-06T23:17:23+08:00">2019-05-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-12 22:03:06" itemprop="dateModified" datetime="2019-05-12T22:03:06+08:00">2019-05-12</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/微服务治理/" itemprop="url" rel="index"><span itemprop="name">微服务治理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="摘要："><a href="#摘要：" class="headerlink" title="摘要："></a>摘要：</h2><p>微服务平台上线后，由于采用微服务架构设计的，多个模块提供一个完整的业务流程，随着业务的发展,规模扩大，服务越来越多，需要协调线上运行的各个服务，保障服务的SLA;基于服务调用的性能KPI数据进行容量管理，合理分配各服务的资源占用;对故障业务做服务降级、流量控制、流量迁移等快速恢复业务。怎样的服务治理框架能满足需求？<br>下面引用李林峰曾经分享的《微服务治理的技术演进和架构实践》，提供对微服务治理的详细阐述。</p>
+<p>大佬介绍：<br>李林锋，华为PaaS平台架构师，8年Java NIO通信框架、平台中间件架构设计和开发经验，开源框架Netty中国推广者。精通Netty、Mina、RPC框架、企业ESB总线、分布式服务框架、云计算等技术，《Netty权威指南》、《分布式服务框架原理与实践》作者，公司总裁技术创新奖获得者</p>
+<p>微服务治理的技术演进和架构实践》分为三个部分。</p>
+<p><strong>为什么需要服务治理</strong><br><strong>服务治理的技术演进历程</strong><br><strong>云端微服务治理框架设计</strong></p>
+<h2 id="为什么需要服务治理？"><a href="#为什么需要服务治理？" class="headerlink" title="为什么需要服务治理？"></a>为什么需要服务治理？</h2><h3 id="第一、业务需求"><a href="#第一、业务需求" class="headerlink" title="第一、业务需求"></a>第一、业务需求</h3><p>随着业务的发展，服务越来越多，如何协调线上运行的各个服务，保障服务的SLA，对服务架构和运维人员是一个很大的挑战。<br>随着业务规模的不断扩大，小服务资源浪费等问题逐渐显现，需要能够基于服务调用的性能KPI数据进行容量管理，合理分配各个服务的资源占用，提高机器的利用率。<br>线上业务发生故障时，需要对故障业务做服务降级、流量控制、流量迁移等，快速恢复业务。</p>
+<p>着开发团队的不断扩大，服务的上线越来越随意，甚至发生功能相同、服务名不同的服务同时上线。<br>上线容易下线难，为了规范服务的上线和下线，在服务发布前，需要走服务预发布流程，由架构师或者项目经理对需要上线的服务做发布审核，审核通过的才能够上线。<br>为了满足服务线下管控、保障线上高效运行，需要有一个统一的服务治理框架对服务进行统一、有效管控，保障服务的高效、健康运行。</p>
+<h3 id="第二、技术需求"><a href="#第二、技术需求" class="headerlink" title="第二、技术需求"></a>第二、技术需求</h3><p>大部分服务化框架的服务属性通过XML配置或者Java注解的方式进行定义，以服务端流量控制为例：<br><img src="/2019/05/06/microservice-governance/Transaction1.jpg" alt="img"></p>
+<p>服务发布的XML文件通常会打包到服务提供者的jar包中，部署在Java Web或者Java Container容器中，存储在服务端的本地磁盘中。<br><img src="/2019/05/06/microservice-governance/Transaction2.jpg" alt="img"></p>
+<p>无论采用注解还是XML配置的方式，如果需要在运行态动态修改服务提供者的流控阈值，都需要在本地修改配置或者修改源码，重新打包部署并升级应用。<br>无法实现在线、配置化的修改和动态生效。由于诸如流控阈值、服务的超时时间等无法预测出最优值，需要修改之后上线验证，根据服务运行效果决定是否再做调整，因此经常需要反复调整，采用修改源码-重新打包部署-应用升级的方式进行服务治理，效率低下。<br>因此，在技术上需要一个服务治理框架，提供Web Portal，微服务运维或者治理人员通过在线配置化的方式修改服务提供者或者消费者的属性，可以实时动态生效。</p>
+<h2 id="服务治理的技术演进历程"><a href="#服务治理的技术演进历程" class="headerlink" title="服务治理的技术演进历程"></a>服务治理的技术演进历程</h2><p><strong>第一代服务治理 SOA Governance: </strong>以IBM为首的SOA解决方案提供商推出的针对企业IT系统的服务治理框架，它主要聚焦在对企业IT系统中异构服务的质量管理、服务发布审批流程管理和服务建模、开发、测试以及运行的全生命周期管理。<br><strong>第二代以分布式服务框架为中心的服务治理：</strong>随着电商和移动互联网的快速发展，基于电商平台的统一分布式服务框架的全新服务治理理念诞生，它聚焦于对内部同构服务的线上治理，保障线上服务的运行质量。相比于传统IT架构的服务治理，由于服务的开发模式、部署规模、组网类型、业务特点等差异巨大，因此服务治理的重点也从线下转移到了线上服务质量保障。<br><strong>第三代以云化为核心的云端微服务治理架构：</strong>2013年至今，随着云计算和微服务架构的发展，以AWS为首的基于微服务架构   云服务化的云端服务治理体系诞生，它的核心理念是服务微自治，利用云调度的弹性和敏捷，逐渐消除人工治理。微服务架构可以实现服务一定程度的自治，例如服务独立打包、独立部署、独立升级和独立扩容。通过云计算的弹性伸缩、单点故障迁移、服务健康度管理和自动容量规划等措施，结合微服务治理，逐步实现微服务的自治。</p>
+<h3 id="第一代-SOA-Governance服务治理"><a href="#第一代-SOA-Governance服务治理" class="headerlink" title="第一代 SOA Governance服务治理"></a>第一代 SOA Governance服务治理</h3><p>第一代SOA Service GovernanceSOA Governance的定位：面向企业IT系统异构服务的治理和服务生命周期管理，它治理的服务通常是SOA服务。<br>传统的SOA Governance包含四部分内容：<br><strong>1.服务建模：</strong>验证功能需求与业务需求，发现和评估当前服务，服务建模和性能需求，开发治理规划。<br><strong>2.服务组装：</strong>创建服务更新计划，创建和修改服务以满足所有业务需求，根据治理策略评估服务，批准组装完成。<br><strong>3.服务部署：</strong>确保服务的质量，措施包括功能测试、性能测试和满足度测试，批准服务部署。<br><strong>4.服务管理：</strong>在整个生命周期内管理和监控服务，跟踪服务注册表中的服务，根据服务质量等级协议（SLA）上报服务的性能KPI数据进行服务质量管理。</p>
+<p>SOA Governance 工作原理图如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction3.jpg" alt="img"></p>
+<p><strong>传统SOA Governance的主要缺点如下：</strong><br>1.分布式服务框架的发展，内部服务框架需要统一，服务治理也需要适应新的架构，能够由表及里，对服务进行细粒度的管控。<br>2.微服务架构的发展和业务规模的扩大，导致服务规模量变引起质变，服务治理的特点和难点也随之发生变化。<br>3.缺少服务运行时动态治理能力，面对突发的流量高峰和业务冲击，传统的服务治理在响应速度、故障快速恢复等方面存在不足，无法更敏捷应对业务需求。</p>
+<h3 id="第二代分布式服务框架服务治理"><a href="#第二代分布式服务框架服务治理" class="headerlink" title="第二代分布式服务框架服务治理"></a>第二代分布式服务框架服务治理</h3><p><strong>分布式服务框架的服务治理定位：</strong>面向互联网业务的服务治理，聚焦在对内部采用统一服务框架服务化的业务运行态、细粒度的敏捷治理体系。<br><strong>治理的对象：</strong>基于统一分布式服务框架开发的业务服务，与协议本身无关，治理的可以是SOA服务，也可以是基于内部服务框架私有协议开发的各种服务。<br><strong>治理策略：</strong>针对互联网业务的特点，例如突发的流量高峰、网络延时、机房故障等，重点针对大规模跨机房的海量服务进行运行态治理，保障线上服务的高SLA，满足用户的体验。<strong>常用的治理策略包括服务的限流降级、服务迁入迁出、服务动态路由和灰度发布等。</strong></p>
+<p>分布式服务框架典型的服务治理体系如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction4.jpg" alt="img"></p>
+<h3 id="第三代云端微服务治理"><a href="#第三代云端微服务治理" class="headerlink" title="第三代云端微服务治理"></a>第三代云端微服务治理</h3><p>随着云计算的发展，Dev&amp;Ops逐渐流行起来，基础设施服务化（IaaS）为大规模、批量流水线式软件交付提供了便利，AWS做为全球最大的云计算解决方案提供商，在微服务云化开发和治理方面积累了非常多的经验，具体总结如下<br>1.全公司统一服务化开发环境，统一简单化服务框架（Coral Service）,统一运行平台，快速高效服务开发；<br>2.所有后端应用服务化，系统由多项服务化组件构成。<br>3.服务共享、原子化、重用。<br>4.服务由小研发团队（2 Pizza Team）负责服务开发、测试、部署和治理，运维整个生命周期支撑。<br>5.高度自动化和Dev&amp;Ops支持，一键式服务部署和回退。<br>6.超大规模支持：后台几十万个服务，成千上万开发者同时使用，平均每秒钟有1-2个服务部署。<br>7.尝试基于Docker容器部署微服务。<br>8.服务治理是核心：服务性能KPI统计、告警、服务健康度管理、灵活的弹性伸缩策略、故障自动迁移、服务限流和服务降级等多种治理手段，保障服务高质量运行。</p>
+<h3 id="云端微服务治理架构设计"><a href="#云端微服务治理架构设计" class="headerlink" title="云端微服务治理架构设计"></a>云端微服务治理架构设计</h3><p>云端微服务治理架构设计的目标如下：<br><strong>防止业务服务架构腐化：</strong>通过服务注册中心对服务强弱依赖进行分析，结合运行时服务调用链关系分析，梳理不合理的依赖和调用路径，优化服务化架构，防止代码腐化。<br><strong>快速故障定界定位：</strong>通过Flume等分布式日志采集框架，实时收集服务调用链日志、服务性能KPI数据、服务接口日志、运行日志等，实时汇总和在线分析，集中存储和展示，实现故障的自动发现、自动分析和在线条件检索，方便运维人员、研发人员进行实时故障诊断。<br><strong>服务微管控：</strong>细粒度的运行期服务治理，包括限流降级、服务迁入迁出、服务超时控制、智能路由、统一配置、优先级调度和流量迁移等，提供方法级治理和动态生效功能，通过一系列细粒度的治理策略，在故障发生时可以多管齐下，在线调整，快速恢复业务。<br><strong>服务生命周期管理：</strong>包括服务的上线审批、下线通知，服务的在线升级，以及线上和线下服务文档库的建设。<br><strong>灵活的资源调度：</strong>基于Docker容器，可以实现微服务的独立部署和细粒度的资源隔离。基于云端的弹性伸缩，可以实现微服务级别的按需伸缩和故障隔离。</p>
+<p>云端微服务治理架构设计云端微服务治理从架构上可以分为三层：<br><img src="/2019/05/06/microservice-governance/Transaction5.jpg" alt="img"></p>
+<p>第一层：微服务治理展示层，它的实现为微服务治理Portal，主要面向系统运维人员或者治理人员，提供在线、配置化的治理界面。<br>第二层：微服务治理SDK，向服务治理提供治理元数据、治理接口、以及客户端的治理类库。<br>第三层：微服务治理服务实现层，微服务治理服务，通过服务注册中心，刷新服务治理属性，同时通知服务提供者和消费者集群各节点刷新内存，使服务治理Portal下发的服务治理策略动态生效。</p>
+<h4 id="1-微服务治理Portal"><a href="#1-微服务治理Portal" class="headerlink" title="1.微服务治理Portal"></a>1.微服务治理Portal</h4><p>微服务治理Portal是微服务治理的门户，它提供服务治理操作界面，供系统运维人员或者测试人员对线上运行的微服务进行动态治理，以保障服务的SLA。<br>Portal框架可以基于AngularJS等Web框架进行开发，它的门户界面如下所示：可以支持同时配置多个服务注册中心集群，对不同的微服务集群进行治理。<br><img src="/2019/05/06/microservice-governance/Transaction6.jpg" alt="img"></p>
+<p>选择某个微服务集群之后，就可以对该集群的微服务进行治理，界面示例如下：<br><img src="/2019/05/06/microservice-governance/Transaction7.jpg" alt="img"></p>
+<p>点击查看，可以查看微服务的状态，以及各种性能指标。点击治理，弹出选择菜单，可以对选择的微服务进行相关的治理操作。</p>
+<h4 id="2-微服务治理SDK"><a href="#2-微服务治理SDK" class="headerlink" title="2.微服务治理SDK"></a>2.微服务治理SDK</h4><p>服务治理SDK层，它主要由如下几部分组成：<br><strong>服务治理元数据：</strong>服务治理元数据主要包括服务治理实体对象，包括服务模型、应用模型、治理组织模型、用户权限模型、数据展示模型等。元数据模型通过Data Mapper和模型扩展，向上层界面屏蔽底层服务框架的数据模型，实现展示层和服务框架的解耦，元数据也可以用于展示界面的定制扩展；<br><strong>服务治理接口：</strong>服务治理Portal调用服务治理接口，实现服务治理。例如服务降级接口、服务流控接口、服务路由权重调整接口、服务迁移接口等。服务接口与具体的协议无关，它通常基于分布式服务框架自身实现，可以是Restful接口，也可以是内部的私有协议；<br><strong>服务治理客户端类库：</strong>由于服务治理服务本身通常也是基于分布式服务框架开发，因此服务治理Portal需要集成分布式服务框架的客户端类库，实现服务的自动发现和调用；<br><strong>调用示例：</strong>客户端SDK需要提供服务治理接口的参数说明、注意事项以及给出常用的调用示例，方便前端开发人员使用；<br><strong>集成开发指南：</strong>服务治理SDK需要提供集成开发指南，指导使用者如何在开发环境中搭建、集成和使用服务治理SDK。</p>
+<h4 id="3-线上服务治理"><a href="#3-线上服务治理" class="headerlink" title="3.线上服务治理"></a>3.线上服务治理</h4><p>线上服务治理包含多种策略，例如：流量控制、服务降级、优先级调度等。微服务启动的时候，将XML或者注解的服务提供者或者消费者属性注册到服务注册中心，由运维人员通过服务治理Portal进行在线修改，注册中心通知服务提供者和消费者刷新内存，动态生效。<br>下面就这几种典型的治理策略进行说明。</p>
+<h5 id="第一、流量控制"><a href="#第一、流量控制" class="headerlink" title="第一、流量控制"></a>第一、流量控制</h5><p>当资源成为瓶颈时，服务框架需要对消费者做限流，启动流控保护机制。流量控制有多种策略，比较常用的有：针对访问速率的静态流控、针对资源占用的动态流控、针对消费者并发连接数的连接控制和针对并行访问数的并发控制。<br><strong>静态流控：</strong>主要针对客户端访问速率进行控制，它通常根据服务质量等级协定（SLA）中约定的QPS做全局流量控制，例如订单服务的静态流控阈值为100 QPS，则无论集群有多少个订单服务实例，它们总的处理速率之和不能超过100 QPS。<br><strong>动态流控：</strong>它的最终目标是为了保命，并不是对流量或者访问速度做精确控制。当系统负载压力非常大时，系统进入过负载状态，可能是CPU、内存资源已经过载，也可能是应用进程内部的资源几乎耗尽，如果继续全量处理业务，可能会导致长时间的Full GC、消息严重积压或者应用进程宕机，最终将压力转移到集群其它节点，引起级联故障。触发动态流控的因子是资源，资源又分为系统资源和应用资源两大类，根据不同的资源负载情况，动态流控又分为多个级别，每个级别流控系数都不同，也就是被拒绝掉的消息比例不同。每个级别都有相应的流控阈值，这个阈值通常支持在线动态调整。<br><strong>并发控制：</strong>针对线程的并发执行数进行控制，它的本质是限制对某个服务或者服务的方法过度消费，耗用过多的资源而影响其它服务的正常运行。并发控制有两种形式：针对服务提供者的全局控制和针对服务消费者的局部控制。<br><strong>连接控制：</strong>通常分布式服务框架服务提供者和消费者之间采用长连接私有协议，为了防止因为消费者连接数过多导致服务端负载压力过大，系统需要支持针对连接数进行流控。</p>
+<h4 id="4-服务降级"><a href="#4-服务降级" class="headerlink" title="4.服务降级"></a>4.服务降级</h4><p>大促或者业务高峰时，为了保证核心服务的SLA，往往需要停掉一些不太重要的业务，例如商品评论、论坛或者粉丝积分等。<br>另外一种场景就是某些服务因为某种原因不可用，但是流程不能直接失败，需要本地Mock服务端实现，做流程放通。以图书阅读为例，如果用户登录余额鉴权服务不能正常工作，需要做业务放通，记录消费话单，允许用户继续阅读，而不是返回失败。<br>通过服务治理的服务降级功能，即可以满足上述两种场景的需求。服务降级主要包括屏蔽降级和容错降级两种策略：</p>
+<p><strong>屏蔽降级：</strong>当外界的触发条件达到某个临界值时，由运维人员/开发人员决策，对某类或者某个服务进行强制降级。<br>它的处理流程如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction8.jpg" alt="img"></p>
+<p><strong>第1步：</strong>运维人员以管理员身份登录服务治理控制台，管理员具备服务治理的全套权限。<br><strong>第2步：</strong>运维人员选择服务降级菜单，在服务降级界面中选择屏蔽降级。<br><strong>第3步：</strong>通过服务查询界面选择需要降级的服务，注意服务的分组和版本信息，指定具体的降级策略：返回null、返回指定异常还是执行本地Mock接口实现。<br><strong>第4步：</strong>服务治理Portal通过服务注册中心客户端SDK，将屏蔽降级指令和相关信息发送到服务注册中心。<br><strong>第5、6步：</strong>服务注册中心接收到屏蔽降级消息后，以事件的形式下分别群发给服务提供者集群和服务消费者集群。<br><strong>第7步：</strong>服务消费者接收到屏蔽降级事件通知之后，获取相关内容，更新本地缓存的服务订阅信息。当发起远程服务调用时，需要与屏蔽降级策略做匹配，如果匹配成功，则执行屏蔽降级逻辑，不发起远程服务调用。<br><strong>第8步：</strong>服务提供者集群接收到屏蔽降级事件通知之后，获取相关内容，更新本地的服务发布缓存信息，将对应的服务降级属性修改为屏蔽降级。<br><strong>第9步：</strong>操作成功之后，服务注册中心返回降级成功的应答消息，由服务治理Portal界面展示。<br><strong>第10步：</strong>运维人员查询服务提供者列表，查看服务状态。<br><strong>第11步：</strong>服务注册中心返回服务状态为屏蔽降级状态。</p>
+<p><strong>容错降级：</strong>当非核心服务不可用时，可以对故障服务做业务逻辑放通，以保障核心服务的运行。容错降级的工作原理如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction9.jpg" alt="img"></p>
+<h4 id="5-服务优先级调度"><a href="#5-服务优先级调度" class="headerlink" title="5.服务优先级调度"></a>5.服务优先级调度</h4><p>当系统当前资源非常有限时，为了保证高优先级的服务能够正常运行，保障服务SLA，需要降低一些非核心服务的调度频次，释放部分资源占用，保障系统的整体运行平稳。<br>服务在发布的时候，可以指定服务的优先级，如果用户没有指定，采用默认优先级策略，它的配置如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction10.jpg" alt="img"></p>
+<p>服务的优先级可以采用传统的低、中、高三级配置策略，每个级别的执行比例可以灵活配置，如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction11.jpg" alt="img"></p>
+<p>服务发布通过扩展priority属性的方式指定优先级，服务提供者将优先级属性注册到服务注册中心并通知消费者，由消费者缓存服务的优先级，根据不同的优先级策略进行调度。<br>服务治理Portal通过动态修改注册中心指定服务priority属性的方式，实现运行态动态调整微服务的优先级。</p>
+<p>总结除了上面介绍的几种常用线上治理策略，比较重要的微服务治理策略还包括：<br><strong>微服务超时控制：</strong>由于微服务调用通常使用RPC方式，是同步阻塞的，因此需要设置服务调用超时时间，防止对端长时间不响应导致的应用线程挂死。超时控制支持在服务端或者消费端配置，需要支持方法级超时控制。<br><strong>微服务路由策略：</strong>负载均衡策略是服务治理的重要特性，分布式服务框架通常会提供多种负载均衡策略，同时支持用户扩展负载均衡策略。常用的路由策略包括：<br><strong>随机：</strong>采用随机算法进行负载均衡，通常在对等集群组网中，随机路由算法消息分发还是比较均匀的。<br><strong>轮循:</strong>按公约后的权重设置轮循比率，到达边界之后，继续绕接。<br><strong>服务调用时延：</strong>消费者缓存所有服务提供者的服务调用时延，周期性的计算服务调用平均时延，然后计算每个服务提供者服务调用时延与平均时延的差值，根据差值大小动态调整权重，保证服务时延大的服务提供者接收更少的消息，防止消息堆积。<br><strong>一致性Hash:</strong>相同参数的请求总是发到同一个服务提供者，当某一台提供者宕机时，原本发往该提供者的请求，基于虚拟节点，平摊到其它提供者，不会引起剧烈变动。<br><strong>粘滞连接:</strong>粘滞连接用于有状态服务，尽可能让客户端总是向同一提供者发起服务调用，除非该提供者宕机，再连接另一台。<br><strong>集群容错策略：</strong>消费者根据配置的路由策略选择某个目标地址之后，发起远程服务调用，在此期间如果发生了远程服务调用异常，则需要服务框架进行集群容错，重新进行选路和调用。集群容错是系统自动执行的，上层用户并不需要关心底层的服务调用过程。<br>集群容错和路由策略的关系如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction12.jpg" alt="img"></p>
+<p><strong>常用的集群容错策略如下:</strong><br><strong>Failover策略:</strong>服务调用失败自动切换策略指的是当发生RPC调用异常时，重新选路，查找下一个可用的服务提供者。通常可以配置失败切换的最大次数和间隔周期，以防止E2E服务调用时延过大。<br><strong>Failback策略：</strong>在很多业务场景中，消费者需要能够获取到服务调用失败的具体信息，通过对失败错误码等异常信息的判断，决定后续的执行策略，例如非幂等性的服务调用。<br><strong>Failcache策略:</strong>Failcache策略是失败自动恢复的一种，在实际项目中它的应用场景如下：- 服务有状态路由，必须定点发送到指定的服务提供者。当发生链路中断、流控等服务暂时不可用时，服务框架将消息临时缓存起来，等待周期T，重新发送，直到服务提供者能够正常处理该消息。- 对时延要求不敏感的服务。系统服务调用失败，通常是链路暂时不可用、服务流控、GC挂住服务提供者进程等，这种失败不是永久性的失败，它的恢复是可预期的。如果消费者对服务调用时延不敏感，可以考虑采用自动恢复模式，即先缓存，再等待，最后重试。-通知类服务。例如通知粉丝积分增长、记录接口日志等，对服务调用的实时性要求不高，可以容忍自动恢复带来的时延增加。<br><strong>Failfast策略：</strong>在业务高峰期，对于一些非核心的服务，希望只调用一次，失败也不再重试，为重要的核心服务节约宝贵的运行资源。此时，快速失败是个不错的选择。</p>
+<p><strong>服务灰度发布：</strong>灰度发布是指在黑与白之间，能够平滑过渡的一种发布方式。AB test就是一种灰度发布方式，让一部用户继续用A，一部分用户开始用B，如果用户对B没有什么反对意见，那么逐步扩大范围，把所有用户都迁移到B上面来。灰度发布可以保证整体系统的稳定，在初始灰度的时候就可以发现、调整问题，以保证其影响度。<br>基于微服务的多版本管理机制灰度路由策略，即可实现基于业务规则的灰度发布。<br><strong>多版本管理：</strong>服务上线之后，随着业务的发展，需要对功能进行变更，或者修复线上的BUG，服务升级之后，往往需要对服务做多版本管理。服务多版本管理是分布式服务框架的重要特性，它涉及到服务的开发、部署、在线升级和服务治理。<br><strong>调用分组管理：</strong>可以对服务按照业务领域、部署的DC信息、服务提供商等角度对微服务进行群组化管理，同群组之间的微服务可以自由调用，跨群组的微服务需要进行审批和授权，以实现不同分组之间的微服务隔离。不同分组之间可以有同名同接口的微服务的不同实现，分组信息也是服务路由的一个因子。<br><strong>全在线服务文档:</strong><br>相对于平台产品，业务服务的升级和修改非常频繁，传统依靠Java DOC进行接口说明和传递的方式，往往会因为缺乏文档建设或API DOC没有及时刷新，导致消费者拿到的接口定义说明不准确。相比于没有文档，拿到过时、错误的API DOC文档对使用者的危害更大。<br>为了解决这个问题，需要建立服务文档中心，方便线上运维人员查看和多团队之间的协作，它的工作原理如下：<br><img src="/2019/05/06/microservice-governance/Transaction13.jpg" alt="img"></p>
+<p>可以基于Swagger UI，构建微服务在线文档库，如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction14.jpg" alt="img"></p>
+<p>可以参考如下链接：<a href="https://github.com/swagger-api/swagger-ui" target="_blank" rel="noopener">https://github.com/swagger-api/swagger-ui</a></p>
+<p><strong>服务上线审批下线通知机制</strong><br>当团队规模扩大之后，会划分成平台基线组、业务定制组等不同研发团队，一些团队甚至跨多地协同开发和运维。服务的上线和下线必须要严格管控起来，一旦不合格的服务上线并被消费者消息，再想下线就非常困难了。<br>对于需要下线的服务管控也很重要，有些服务虽然调用频次不高，业务量也不大。但是如果贸然下线，很有可能导致依赖它的消费者业务调用失败，这会违反服务的SLA协定，给服务提供商造成损失。<br>服务的上线审批、下线通知机制需要建立完善起来，它的工作原理如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction15.jpg" alt="img"></p>
+<p>除了以上介绍的常用服务治理措施，线下服务治理还包括：1.业务的梳理、服务划分原则和方法论；2.服务跨团队协作流程、准则、工具和方法论；3.服务的接口兼容性原则和规范；4.其它…线下服务治理依团队和业务不同，需求也不同，需要业务团队和服务框架团队长期梳理、实践和优化，才能够提升线下服务治理的效率，它的建设是个长期过程，并非一蹴而就。</p>
+<h2 id="云端自治理"><a href="#云端自治理" class="headerlink" title="云端自治理"></a>云端自治理</h2><h3 id="微服务弹性伸缩"><a href="#微服务弹性伸缩" class="headerlink" title="微服务弹性伸缩"></a>微服务弹性伸缩</h3><p>基于PaaS云化平台或者Docker容器服务，可以实现基于负载的微服务弹性伸缩。<br>基于PaaS平台部署微服务架构示例如下：<br><img src="/2019/05/06/microservice-governance/Transaction16.jpg" alt="img"></p>
+<p>基于Docker容器部署微服务示例如下：<br><img src="/2019/05/06/microservice-governance/Transaction17.jpg" alt="img"></p>
+<p>基于云的动态资源调度，可以实现微服务的弹性伸缩：基于CPU、内存、磁盘、网络带宽等资源占用率的弹性伸缩策略。<br>当VM或者容器的资源占用达到设置的阈值之后，自动执行扩容策略，动态创建微服务的运行环境，部署并运行新的微服务实例。基于业务指标的弹性伸缩策略。<br>例如微服务的平均时延、吞吐量、成功率等。通过对微服务的性能指标进行分布式采集、汇总和计算，判断业务指标是否达到伸缩阈值，如果达到，则自动触发微服务的伸缩流程，执行弹性伸缩。用户自定义的弹性伸缩策略。<br>可以对基于资源占用率的伸缩策略和基于业务指标的伸缩策略做组合，实现更复杂的弹性伸缩。基于云平台的微服务弹性伸缩流程如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction18.jpg" alt="img"></p>
+<h3 id="E2E微服务生命周期管理"><a href="#E2E微服务生命周期管理" class="headerlink" title="E2E微服务生命周期管理"></a>E2E微服务生命周期管理</h3><p>利用云平台对资源的动态编排和调度，可以实现基础设施自动化。利用ALM（应用生命周期管理）可以实现微服务的E2E生命周期管理。<br>基于Docker容器的微服务基础设施自动化流程如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction19.jpg" alt="img"></p>
+<p>微服务上线运行之后，利用云平台的ALM服务，可以对微服务进行上下线、升级、回滚等生命周期管理操作：<br><img src="/2019/05/06/microservice-governance/Transaction20.jpg" alt="img"></p>
+<p>基于云平台提供的微服务生命周期管理服务，可以实现海量微服务的高效部署、升级和管理，而不需要关心物理基础设施的环境准备和安装，以及资源规划等，极大的提升了微服务的上线运行效率，降低了微服务的管理成本。</p>
+<h3 id="微服务治理全景图"><a href="#微服务治理全景图" class="headerlink" title="微服务治理全景图"></a>微服务治理全景图</h3><p><img src="/2019/05/06/microservice-governance/Transaction21.jpg" alt="img"></p>
+<p>微服务治理涵盖的范围非常广，很多治理手段也需要业务在实际开发中积累和沉淀，并没有统一的标准，这就是实施微服务治理的困难之处。<br>在微服务治理发展的同时，云化和容器化革命也正在进行，结合云平台的敏捷性和弹性资源调度，微服务治理将逐步由人工治理向自动化治理演进。<br>微服务治理总体结构图如下所示：<br><img src="/2019/05/06/microservice-governance/Transaction22.jpg" alt="img"></p>
+<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h2><p><strong>Q1：请问在实际使用时，前端网关有什么来源框架，还有分布式跟踪系统，有推荐吗？</strong><br>A1: 前端网关，开源的有WSO2，基于Java语言的，GO语言的有Tyk。</p>
+<p><strong>Q2:能展开讲一下优先级调度么</strong><br>A1：分布式跟踪系统打印 埋点日志比较简单，但是复杂的是后端的大数据分析。采集可以基于FLume等，后端的分析可以基于HBase   Spark</p>
+<p><strong>Q3:请教一下，对应用层扩容很容易，很多时候一个服务慢了，根本原因是依赖的存储  数据库  外部接口的原因，这个时候对应用层扩容解决不了问题，paas的扩容还有什么意义呢？  数据库扩容  涉及数据迁移，应用层连接池更新等等  paas不能简单扩容</strong><br>A3：PaaS层的扩容通常会有几种策略：<br>1、基于资源使用率的扩容；<br>2、基于服务性能指标的扩容；<br>3、混合模式；<br>4、业务自定义扩容策略，这种场景通常是级联扩容，也就是应用依赖的服务也需要同时做扩容，例如缓存、MQ等。但是，不是所有的PaaS都支持策略4。</p>
+<p><strong>Q4:怎样从传统的系统转化到云服务上，在系统设计及技术架构有什么需要注意点。</strong><br>A4: 不知道你讲的传统系统是不是指的非云系统。非云应用转到云化服务有几点设计考虑：1、服务化；2、利用云的动态性，例如弹性伸缩等；3、统一配置，使用云化的统一配置服务。</p>
+<p><strong>Q5：那mq 缓存 数据库的client都要改造  支持后端自动发现了，好多中间价的client都是配置死的，有可分享的开源实现么</strong><br>A5：包括前端的URL地址，MQ服务端的URL等，云化之后，MQ等服务也是一种云化服务，例如AWS的S3服务。在我们的实践中，原来的本地配置都统一放到了配置服务上，它是基于ZK的云化统一配置服务，地址都是从注册中心读取的，而不是本地配置。这样，就可以支持动态发现。</p>
+<p><strong>Q6：应用服务化后，涉及服务与服务之间的远程rpc，请问数据传输过程中一般采用哪种系列化方式，之间的优缺点都有哪些？还有场景</strong><br>A6： 几种场景考量：<br>1、如果服务看中的是标准化、开放性，对性能要求不是特别苛刻。则建议采用 Restful JSON的方式；<br>2、如果是内部各模块之间的服务化调用，对性能、时延要求非常高，则建议采用二进制私有协议的方式，例如可以参考或者选择ProtocolBuf、Thrift等。通常而言，服务跟协议是解耦的，也就是说某个服务，可以同时发布成多种协议。</p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>微服务上线只是微服务前期的工作，其上线后的治理和运维也是微服务重要的组成部分，如何做好治理和运维，以及这条路上的技术架构演变，李林峰在以上给了一个好的阐述，<br>但是随着微服务概念的普及，一定不断有新的治理和运维方式出现。本博也会不断的跟进微服务的治理和运维。<br>希望各位读者也能提出问题，交流思想和解决问题。</p>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构实践/" rel="tag"># 架构实践</a>
+          
+            <a href="/tags/技术演进/" rel="tag"># 技术演进</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/06/service-concept-diff/" rel="next" title="分布式，集群，SOA，微服务的区别与联系">
+                <i class="fa fa-chevron-left"></i> 分布式，集群，SOA，微服务的区别与联系
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/06/tb-design/" rel="prev" title="淘宝大秒系统设计详解">
+                淘宝大秒系统设计详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#摘要："><span class="nav-number">1.</span> <span class="nav-text">摘要：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要服务治理？"><span class="nav-number">2.</span> <span class="nav-text">为什么需要服务治理？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一、业务需求"><span class="nav-number">2.1.</span> <span class="nav-text">第一、业务需求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二、技术需求"><span class="nav-number">2.2.</span> <span class="nav-text">第二、技术需求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务治理的技术演进历程"><span class="nav-number">3.</span> <span class="nav-text">服务治理的技术演进历程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一代-SOA-Governance服务治理"><span class="nav-number">3.1.</span> <span class="nav-text">第一代 SOA Governance服务治理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二代分布式服务框架服务治理"><span class="nav-number">3.2.</span> <span class="nav-text">第二代分布式服务框架服务治理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三代云端微服务治理"><span class="nav-number">3.3.</span> <span class="nav-text">第三代云端微服务治理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#云端微服务治理架构设计"><span class="nav-number">3.4.</span> <span class="nav-text">云端微服务治理架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-微服务治理Portal"><span class="nav-number">3.4.1.</span> <span class="nav-text">1.微服务治理Portal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-微服务治理SDK"><span class="nav-number">3.4.2.</span> <span class="nav-text">2.微服务治理SDK</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-线上服务治理"><span class="nav-number">3.4.3.</span> <span class="nav-text">3.线上服务治理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#第一、流量控制"><span class="nav-number">3.4.3.1.</span> <span class="nav-text">第一、流量控制</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-服务降级"><span class="nav-number">3.4.4.</span> <span class="nav-text">4.服务降级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-服务优先级调度"><span class="nav-number">3.4.5.</span> <span class="nav-text">5.服务优先级调度</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#云端自治理"><span class="nav-number">4.</span> <span class="nav-text">云端自治理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务弹性伸缩"><span class="nav-number">4.1.</span> <span class="nav-text">微服务弹性伸缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#E2E微服务生命周期管理"><span class="nav-number">4.2.</span> <span class="nav-text">E2E微服务生命周期管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微服务治理全景图"><span class="nav-number">4.3.</span> <span class="nav-text">微服务治理全景图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Q-amp-A"><span class="nav-number">5.</span> <span class="nav-text">Q&amp;A</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结："><span class="nav-number">6.</span> <span class="nav-text">总结：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

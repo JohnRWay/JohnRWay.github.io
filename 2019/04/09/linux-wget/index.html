@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-fill-left.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux wget是一个下载文件的工具，它用在命令行下。对于Linux用户是必不可少的工具，尤其对于网络管理员，经常要下载一些软件或从远程服务器恢复备份到本地服务器。如果我们使用虚拟主机，处理这样的事务我们只能先从远程服务器下载到我们电脑磁盘，然后再用ftp工具上传到服务器。这样既浪费时间又浪费精力，那不没办法的事。而到了Linux VPS，它则可以直接下载到服务器而不用经过上传这一步。wget">
+<meta name="keywords" content="linux,工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux wget 命令用法详解">
+<meta property="og:url" content="http://yoursite.com/2019/04/09/linux-wget/index.html">
+<meta property="og:site_name" content="Coding For Dream">
+<meta property="og:description" content="Linux wget是一个下载文件的工具，它用在命令行下。对于Linux用户是必不可少的工具，尤其对于网络管理员，经常要下载一些软件或从远程服务器恢复备份到本地服务器。如果我们使用虚拟主机，处理这样的事务我们只能先从远程服务器下载到我们电脑磁盘，然后再用ftp工具上传到服务器。这样既浪费时间又浪费精力，那不没办法的事。而到了Linux VPS，它则可以直接下载到服务器而不用经过上传这一步。wget">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-04-09T14:23:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux wget 命令用法详解">
+<meta name="twitter:description" content="Linux wget是一个下载文件的工具，它用在命令行下。对于Linux用户是必不可少的工具，尤其对于网络管理员，经常要下载一些软件或从远程服务器恢复备份到本地服务器。如果我们使用虚拟主机，处理这样的事务我们只能先从远程服务器下载到我们电脑磁盘，然后再用ftp工具上传到服务器。这样既浪费时间又浪费精力，那不没办法的事。而到了Linux VPS，它则可以直接下载到服务器而不用经过上传这一步。wget">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/09/linux-wget/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>linux wget 命令用法详解 | Coding For Dream</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coding For Dream</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">I never feared death or dying, I only fear never trying.</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">49</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">26</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">56</span></a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/09/linux-wget/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coding For Dream">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">linux wget 命令用法详解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-09 21:39:38 / Modified: 22:23:59" itemprop="dateCreated datePublished" datetime="2019-04-09T21:39:38+08:00">2019-04-09</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux wget是一个下载文件的工具，它用在命令行下。对于Linux用户是必不可少的工具，尤其对于网络管理员，经常要下载一些软件或从远程服务器恢复备份到本地服务器。如果我们使用虚拟主机，处理这样的事务我们只能先从远程服务器下载到我们电脑磁盘，然后再用ftp工具上传到服务器。这样既浪费时间又浪费精力，那不没办法的事。而到了Linux VPS，它则可以直接下载到服务器而不用经过上传这一步。wget工具体积小但功能完善，它支持断点下载功能，同时支持FTP和HTTP下载方式，支持代理服务器和设置起来方便简单。下面我们以实例的形式说明怎么使用wget。 </p>
+<h3 id="1-使用wget下载单个文件"><a href="#1-使用wget下载单个文件" class="headerlink" title="1.使用wget下载单个文件"></a>1.使用wget下载单个文件</h3><p>以下的例子是从网络下载一个文件并保存在当前目录<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://cn.wordpress.org/wordpress-3.1-zh_CN.zip</span><br></pre></td></tr></table></figure></p>
+<p>在下载的过程中会显示进度条，包含（下载完成百分比，已经下载的字节，当前下载速度，剩余下载时间）。 </p>
+<h3 id="2-使用wget-O下载并以不同的文件名保存"><a href="#2-使用wget-O下载并以不同的文件名保存" class="headerlink" title="2.使用wget -O下载并以不同的文件名保存"></a>2.使用wget -O下载并以不同的文件名保存</h3><p>wget默认会以最后一个符合”/”的后面的字符来命令，对于动态链接的下载通常文件名会不正确。<br>错误：下面的例子会下载一个文件并以名称download.php?id=1080保存<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://www.centos.bz/download?id=1080</span><br></pre></td></tr></table></figure></p>
+<p>即使下载的文件是zip格式，它仍然以download.php?id=1080命名。<br>正确：为了解决这个问题，我们可以使用参数-O来指定一个文件名：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -O wordpress.zip http://www.centos.bz/download.php?id=1080</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-使用wget-–limit-rate限速下载"><a href="#3-使用wget-–limit-rate限速下载" class="headerlink" title="3.使用wget –limit-rate限速下载"></a>3.使用wget –limit-rate限速下载</h3><p>当你执行wget的时候，它默认会占用全部可能的宽带下载。但是当你准备下载一个大文件，而你还需要下载其它文件时就有必要限速了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –<span class="built_in">limit</span>-rate=300k http://cn.wordpress.org/wordpress-3.1-zh_CN.zip</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-使用wget-c断点续传"><a href="#4-使用wget-c断点续传" class="headerlink" title="4.使用wget -c断点续传"></a>4.使用wget -c断点续传</h3><p>使用wget -c重新启动下载中断的文件:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -c http://cn.wordpress.org/wordpress-3.1-zh_CN.zip</span><br></pre></td></tr></table></figure></p>
+<p>对于我们下载大文件时突然由于网络等原因中断非常有帮助，我们可以继续接着下载而不是重新下载一个文件。需要继续中断的下载时可以使用-c参数。 </p>
+<h3 id="5-使用wget-b后台下载"><a href="#5-使用wget-b后台下载" class="headerlink" title="5.使用wget -b后台下载"></a>5.使用wget -b后台下载</h3><p>对于下载非常大的文件的时候，我们可以使用参数-b进行后台下载。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget -b http://cn.wordpress.org/wordpress-3.1-zh_CN.zip </span><br><span class="line">Continuing <span class="keyword">in</span> background, pid 1840. </span><br><span class="line">Output will be written to `wget-log’.</span><br></pre></td></tr></table></figure></p>
+<p>你可以使用以下命令来察看下载进度<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f wget-log</span><br></pre></td></tr></table></figure></p>
+<h3 id="6-伪装代理名称下载"><a href="#6-伪装代理名称下载" class="headerlink" title="6.伪装代理名称下载"></a>6.伪装代理名称下载</h3><p>有些网站能通过根据判断代理名称不是浏览器而拒绝你的下载请求。不过你可以通过–user-agent参数伪装。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –user-agent=”Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.648.204 Safari/534.16″ 下载链接</span><br></pre></td></tr></table></figure></p>
+<h3 id="7-使用wget-–spider测试下载链接"><a href="#7-使用wget-–spider测试下载链接" class="headerlink" title="7.使用wget –spider测试下载链接"></a>7.使用wget –spider测试下载链接</h3><p>当你打算进行定时下载，你应该在预定时间测试下载链接是否有效。我们可以增加–spider参数进行检查。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –spider URL</span><br></pre></td></tr></table></figure></p>
+<p>如果下载链接正确，将会显示<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget –spider URL </span><br><span class="line">Spider mode enabled. Check <span class="keyword">if</span> remote file exists. </span><br><span class="line">HTTP request sent, awaiting response… 200 OK </span><br><span class="line">Length: unspecified [text/html] </span><br><span class="line">Remote file exists and could contain further links, </span><br><span class="line">but recursion is disabled — not retrieving.</span><br></pre></td></tr></table></figure></p>
+<p>这保证了下载能在预定的时间进行，但当你给错了一个链接，将会显示如下错误<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget –spider url </span><br><span class="line">Spider mode enabled. Check <span class="keyword">if</span> remote file exists. </span><br><span class="line">HTTP request sent, awaiting response… 404 Not Found </span><br><span class="line">Remote file does not exist — broken link!!!</span><br></pre></td></tr></table></figure></p>
+<p>你可以在以下几种情况下使用spider参数：<br>    a.定时下载之前进行检查<br>    b.间隔检测网站是否可用<br>    c.检查网站页面的死链接 </p>
+<h3 id="8-使用wget-–tries增加重试次数"><a href="#8-使用wget-–tries增加重试次数" class="headerlink" title="8.使用wget –tries增加重试次数"></a>8.使用wget –tries增加重试次数</h3><p>如果网络有问题或下载一个大文件也有可能失败。wget默认重试20次连接下载文件。如果需要，你可以使用–tries增加重试次数。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –tries=40 URL</span><br></pre></td></tr></table></figure></p>
+<h3 id="9-使用wget-i下载多个文件"><a href="#9-使用wget-i下载多个文件" class="headerlink" title="9.使用wget -i下载多个文件"></a>9.使用wget -i下载多个文件</h3><p>首先，保存一份下载链接文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cat &gt; filelist.txt </span><br><span class="line">url1 </span><br><span class="line">url2 </span><br><span class="line">url3 </span><br><span class="line">url4</span><br></pre></td></tr></table></figure></p>
+<p>接着使用这个文件和参数-i下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -i filelist.txt</span><br></pre></td></tr></table></figure></p>
+<h3 id="10-使用wget-–mirror镜像网站"><a href="#10-使用wget-–mirror镜像网站" class="headerlink" title="10.使用wget –mirror镜像网站"></a>10.使用wget –mirror镜像网站</h3><p>下面的例子是下载整个网站到本地。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –mirror -p –convert-links -P ./LOCAL URL</span><br></pre></td></tr></table></figure></p>
+<p>–miror:开户镜像下载<br>-p:下载所有为了html页面显示正常的文件<br>–convert-links:下载后，转换成本地的链接<br>-P ./LOCAL：保存所有文件和目录到本地指定目录 </p>
+<h3 id="11-使用wget-–reject过滤指定格式下载"><a href="#11-使用wget-–reject过滤指定格式下载" class="headerlink" title="11.使用wget –reject过滤指定格式下载"></a>11.使用wget –reject过滤指定格式下载</h3><p>你想下载一个网站，但你不希望下载图片，你可以使用以下命令。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –reject=gif url</span><br></pre></td></tr></table></figure></p>
+<h3 id="12-使用wget-o把下载信息存入日志文件"><a href="#12-使用wget-o把下载信息存入日志文件" class="headerlink" title="12.使用wget -o把下载信息存入日志文件"></a>12.使用wget -o把下载信息存入日志文件</h3><p>你不希望下载信息直接显示在终端而是在一个日志文件，可以使用以下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -o download.log URL</span><br></pre></td></tr></table></figure></p>
+<h3 id="13-使用wget-Q限制总下载文件大小"><a href="#13-使用wget-Q限制总下载文件大小" class="headerlink" title="13.使用wget -Q限制总下载文件大小"></a>13.使用wget -Q限制总下载文件大小</h3><p>当你想要下载的文件超过5M而退出下载，你可以使用以下命令:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -Q5m -i filelist.txt</span><br></pre></td></tr></table></figure></p>
+<p>注意：这个参数对单个文件下载不起作用，只能递归下载时才有效。 </p>
+<h3 id="14-使用wget-r-A下载指定格式文件"><a href="#14-使用wget-r-A下载指定格式文件" class="headerlink" title="14.使用wget -r -A下载指定格式文件"></a>14.使用wget -r -A下载指定格式文件</h3><p>可以在以下情况使用该功能 </p>
+<p>下载一个网站的所有图片<br>下载一个网站的所有视频<br>下载一个网站的所有PDF文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -r -A.pdf url</span><br></pre></td></tr></table></figure></p>
+<h3 id="15-使用wget-FTP下载"><a href="#15-使用wget-FTP下载" class="headerlink" title="15.使用wget FTP下载"></a>15.使用wget FTP下载</h3><p>你可以使用wget来完成ftp链接的下载。<br>使用wget匿名ftp下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget ftp-url</span><br></pre></td></tr></table></figure></p>
+<p>使用wget用户名和密码认证的ftp下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget –ftp-user=USERNAME –ftp-password=PASSWORD url</span><br></pre></td></tr></table></figure></p>
+<h3 id="wget是在Linux下开发的开放源代码的软件，作者是Hrvoje-Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点："><a href="#wget是在Linux下开发的开放源代码的软件，作者是Hrvoje-Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点：" class="headerlink" title="wget是在Linux下开发的开放源代码的软件，作者是Hrvoje Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点："></a>wget是在Linux下开发的开放源代码的软件，作者是Hrvoje Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点：</h3><p>（1）支持断点下传功能；这一点，也是网络蚂蚁和FlashGet当年最大的卖点，现在，Wget也可以使用此功能，那些网络不是太好的用户可以放心了；<br>（2）同时支持FTP和HTTP下载方式；尽管现在大部分软件可以使用HTTP方式下载，但是，有些时候，仍然需要使用FTP方式下载软件；<br>（3）支持代理服务器；对安全强度很高的系统而言，一般不会将自己的系统直接暴露在互联网上，所以，支持代理是下载软件必须有的功能；<br>（4）设置方便简单；可能，习惯图形界面的用户已经不是太习惯命令行了，但是，命令行在设置上其实有更多的优点，最少，鼠标可以少点很多次，也不要担心是否错点鼠标；<br>（5）程序小，完全免费；程序小可以考虑不计，因为现在的硬盘实在太大了；完全免费就不得不考虑了，即使网络上有很多所谓的免费软件，但是，这些软件的广告却不是我们喜欢的； </p>
+<p>wget虽然功能强大，但是使用起来还是比较简单的，基本的语法是：wget [参数列表] URL。下面就结合具体的例子来说明一下wget的用法。 </p>
+<h3 id="1-下载整个http或者ftp站点。"><a href="#1-下载整个http或者ftp站点。" class="headerlink" title="1.下载整个http或者ftp站点。"></a>1.下载整个http或者ftp站点。</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://place.your.url/here</span><br></pre></td></tr></table></figure>
+<p>这个命令可以将<a href="http://place.your.url/here" target="_blank" rel="noopener">http://place.your.url/here</a> 首页下载下来。使用-x会强制建立服务器上一模一样的目录，如果使用-nd参数，那么服务器上下载的所有内容都会加到本地当前目录。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -r http://place.your.url/here</span><br></pre></td></tr></table></figure></p>
+<p>这 个命令会按照递归的方法，下载服务器上所有的目录和文件，实质就是下载整个网站。这个命令一定要小心使用，因为在下载的时候，被下载网站指向的所有地址同 样会被下载，因此，如果这个网站引用了其他网站，<br>那么被引用的网站也会被下载下来！基于这个原因，这个参数不常用。可以用-l number参数来指定下载的层次。例如只下载两层，那么使用-l 2。 </p>
+<p>要是您想制作镜像站点，那么可以使用－m参数，例如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -m http://place.your.url/here</span><br></pre></td></tr></table></figure></p>
+<p>这时wget会自动判断合适的参数来制作镜像站点。此时，wget会登录到服务器上，读入robots.txt并按robots.txt的规定来执行。 </p>
+<h3 id="2-断点续传。"><a href="#2-断点续传。" class="headerlink" title="2.断点续传。"></a>2.断点续传。</h3><p>当文件特别大或者网络特别慢的时候，往往一个文件还没有下载完，连接就已经被切断，此时就需要断点续传。wget的断点续传是自动的，只需要使用-c参数，例如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -c http://the.url.of/incomplete/file</span><br></pre></td></tr></table></figure></p>
+<p>使用断点续传要求服务器支持断点续传。-t参数表示重试次数，例如需要重试100次，那么就写-t 100，如果设成-t 0，那么表示无穷次重试，直到连接成功。-T参数表示超时等待时间，例如-T 120，表示等待120秒连接不上就算超时。 </p>
+<h3 id="3-批量下载。"><a href="#3-批量下载。" class="headerlink" title="3.批量下载。"></a>3.批量下载。</h3><p>如果有多个文件需要下载，那么可以生成一个文件，把每个文件的URL写一行，例如生成文件download.txt，然后用命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -i download.txt</span><br></pre></td></tr></table></figure></p>
+<p>这样就会把download.txt里面列出的每个URL都下载下来。（如果列的是文件就下载文件，如果列的是网站，那么下载首页） </p>
+<h3 id="4-选择性的下载。"><a href="#4-选择性的下载。" class="headerlink" title="4.选择性的下载。"></a>4.选择性的下载。</h3><p>可以指定让wget只下载一类文件，或者不下载什么文件。例如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -m –reject=gif http://target.web.site/subdirectory</span><br></pre></td></tr></table></figure></p>
+<p>表示下载<a href="http://target.web.site/subdirectory，但是忽略gif文件。–accept=LIST" target="_blank" rel="noopener">http://target.web.site/subdirectory，但是忽略gif文件。–accept=LIST</a> 可以接受的文件类型，–reject=LIST拒绝接受的文件类型。 </p>
+<h3 id="5-密码和认证。"><a href="#5-密码和认证。" class="headerlink" title="5.密码和认证。"></a>5.密码和认证。</h3><p>wget只能处理利用用户名/密码方式限制访问的网站，可以利用两个参数：<br>–http-user=USER设置HTTP用户<br>–http-passwd=PASS设置HTTP密码<br>对于需要证书做认证的网站，就只能利用其他下载工具了，例如curl。 </p>
+<h3 id="6-利用代理服务器进行下载。"><a href="#6-利用代理服务器进行下载。" class="headerlink" title="6.利用代理服务器进行下载。"></a>6.利用代理服务器进行下载。</h3><p>如果用户的网络需要经过代理服务器，那么可以让wget通过代理服务器进行文件的下载。此时需要在当前用户的目录下创建一个.wgetrc文件。文件中可以设置代理服务器：<br>http-proxy = 111.111.111.111:8080<br>ftp-proxy = 111.111.111.111:8080<br>分别表示http的代理服务器和ftp的代理服务器。如果代理服务器需要密码则使用：<br>–proxy-user=USER设置代理用户<br>–proxy-passwd=PASS设置代理密码<br>这两个参数。<br>使用参数–proxy=on/off 使用或者关闭代理。<br>wget还有很多有用的功能，需要用户去挖掘。 </p>
+<h3 id="附录："><a href="#附录：" class="headerlink" title="附录："></a>附录：</h3><p>命令格式：<br>wget [参数列表] [目标软件、网页的网址] </p>
+<p>-V,–version 显示软件版本号然后退出；<br>-h,–help显示软件帮助信息；<br>-e,–execute=COMMAND 执行一个 “.wgetrc”命令 </p>
+<p>-o,–output-file=FILE 将软件输出信息保存到文件；<br>-a,–append-output=FILE将软件输出信息追加到文件；<br>-d,–debug显示输出信息；<br>-q,–quiet 不显示输出信息；<br>-i,–input-file=FILE 从文件中取得URL； </p>
+<p>-t,–tries=NUMBER 是否下载次数（0表示无穷次）<br>-O –output-document=FILE下载文件保存为别的文件名<br>-nc, –no-clobber 不要覆盖已经存在的文件<br>-N,–timestamping只下载比本地新的文件<br>-T,–timeout=SECONDS 设置超时时间<br>-Y,–proxy=on/off 关闭代理 </p>
+<p>-nd,–no-directories 不建立目录<br>-x,–force-directories 强制建立目录 </p>
+<p>–http-user=USER设置HTTP用户<br>–http-passwd=PASS设置HTTP密码<br>–proxy-user=USER设置代理用户<br>–proxy-passwd=PASS设置代理密码 </p>
+<p>-r,–recursive 下载整个网站、目录（小心使用）<br>-l,–level=NUMBER 下载层次 </p>
+<p>-A,–accept=LIST 可以接受的文件类型<br>-R,–reject=LIST拒绝接受的文件类型<br>-D,–domains=LIST可以接受的域名<br>–exclude-domains=LIST拒绝的域名<br>-L,–relative 下载关联链接<br>–follow-ftp 只下载FTP链接<br>-H,–span-hosts 可以下载外面的主机<br>-I,–include-directories=LIST允许的目录<br>-X,–exclude-directories=LIST 拒绝的目录 </p>
+<p>中文文档名在平常的情况下会被编码， 但是在 –cut-dirs 时又是正常的，<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget -r -np -nH –cut-dirs=3 ftp://host/<span class="built_in">test</span>/ </span><br><span class="line">测试.txt </span><br><span class="line">wget -r -np -nH -nd ftp://host/<span class="built_in">test</span>/ </span><br><span class="line">%B4%FA%B8%D5.txt </span><br><span class="line">wget “ftp://host/<span class="built_in">test</span>/*” </span><br><span class="line">%B4%FA%B8%D5.txt</span><br></pre></td></tr></table></figure></p>
+<p>由于不知名的原因，可能是为了避开特殊档名，wget 会自动将抓取档名的部分用encode_string处理过，所以该patch就把被encode_string处理成“%3A”这种东西，<br>用decode_string还原成 “:”，并套用在目录与档案名称的部分，decode_string是wget内建的函式。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -t0 -c -nH -x -np -b -m -P /home/sunny/NOD32view/ http://downloads1.kaspersky-labs.com/bases/ -o wget.log</span><br></pre></td></tr></table></figure></p>
+<p>加油！Coding For Dream！！<br>I never feared death or dying, I only fear never trying. –Fast &amp; Furious</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/工具/" rel="tag"># 工具</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/09/mysqlproblem/" rel="next" title="Mysql Client工具无法连接Mysql Server的问题解决">
+                <i class="fa fa-chevron-left"></i> Mysql Client工具无法连接Mysql Server的问题解决
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/10/linux-rpm-deb/" rel="prev" title="linux中的rpm包和deb">
+                linux中的rpm包和deb <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="John">
+            
+              <p class="site-author-name" itemprop="name">John</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">26</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/" title="GitHub &rarr; https://github.com/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://spring.io/" title="https://spring.io/" rel="noopener" target="_blank">Spring</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.mysql.com/" title="https://www.mysql.com/" rel="noopener" target="_blank">MySQL</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jhipster.tech/" title="https://www.jhipster.tech/" rel="noopener" target="_blank">JHipster</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.elastic.co/guide/index.html" title="https://www.elastic.co/guide/index.html" rel="noopener" target="_blank">ElasticStack</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-使用wget下载单个文件"><span class="nav-number">1.</span> <span class="nav-text">1.使用wget下载单个文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用wget-O下载并以不同的文件名保存"><span class="nav-number">2.</span> <span class="nav-text">2.使用wget -O下载并以不同的文件名保存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用wget-–limit-rate限速下载"><span class="nav-number">3.</span> <span class="nav-text">3.使用wget –limit-rate限速下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-使用wget-c断点续传"><span class="nav-number">4.</span> <span class="nav-text">4.使用wget -c断点续传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-使用wget-b后台下载"><span class="nav-number">5.</span> <span class="nav-text">5.使用wget -b后台下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-伪装代理名称下载"><span class="nav-number">6.</span> <span class="nav-text">6.伪装代理名称下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-使用wget-–spider测试下载链接"><span class="nav-number">7.</span> <span class="nav-text">7.使用wget –spider测试下载链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-使用wget-–tries增加重试次数"><span class="nav-number">8.</span> <span class="nav-text">8.使用wget –tries增加重试次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-使用wget-i下载多个文件"><span class="nav-number">9.</span> <span class="nav-text">9.使用wget -i下载多个文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-使用wget-–mirror镜像网站"><span class="nav-number">10.</span> <span class="nav-text">10.使用wget –mirror镜像网站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-使用wget-–reject过滤指定格式下载"><span class="nav-number">11.</span> <span class="nav-text">11.使用wget –reject过滤指定格式下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-使用wget-o把下载信息存入日志文件"><span class="nav-number">12.</span> <span class="nav-text">12.使用wget -o把下载信息存入日志文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-使用wget-Q限制总下载文件大小"><span class="nav-number">13.</span> <span class="nav-text">13.使用wget -Q限制总下载文件大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-使用wget-r-A下载指定格式文件"><span class="nav-number">14.</span> <span class="nav-text">14.使用wget -r -A下载指定格式文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-使用wget-FTP下载"><span class="nav-number">15.</span> <span class="nav-text">15.使用wget FTP下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wget是在Linux下开发的开放源代码的软件，作者是Hrvoje-Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点："><span class="nav-number">16.</span> <span class="nav-text">wget是在Linux下开发的开放源代码的软件，作者是Hrvoje Niksic，后来被移植到包括Windows在内的各个平台上。它有以下功能和特点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-下载整个http或者ftp站点。"><span class="nav-number">17.</span> <span class="nav-text">1.下载整个http或者ftp站点。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-断点续传。"><span class="nav-number">18.</span> <span class="nav-text">2.断点续传。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-批量下载。"><span class="nav-number">19.</span> <span class="nav-text">3.批量下载。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-选择性的下载。"><span class="nav-number">20.</span> <span class="nav-text">4.选择性的下载。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-密码和认证。"><span class="nav-number">21.</span> <span class="nav-text">5.密码和认证。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-利用代理服务器进行下载。"><span class="nav-number">22.</span> <span class="nav-text">6.利用代理服务器进行下载。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附录："><span class="nav-number">23.</span> <span class="nav-text">附录：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+
+  
+
+  
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
