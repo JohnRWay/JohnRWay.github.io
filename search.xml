@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[�������Լ���ʹ��Hexo]]></title>
+    <title><![CDATA[换个电脑继续使用Hexo]]></title>
     <url>%2F2019%2F06%2F03%2Fhexo-update%2F</url>
-    <content type="text"><![CDATA[����ԭ�����ļ����뿽���ļ���������_config.yml������ theme������ scaffolds #����ģ�������� package.json #˵��ʹ����Щ�������� .gitignore #�޶����ύ��ʱ����Щ�ļ����Ժ��������� source��1����������Щ�ļ��Ǳ��뿽���ģ�������֮ǰ�Լ��޸ĵ��ļ�����վ������_config.yml��theme�ļ�����������⣬�Լ�source�����Լ�д�Ĳ����ļ�����Щ�϶�Ҫ�����ġ� ����֮�⣬���������ļ���Ҫ�У�����scaffolds�ļ��У����µ�ģ�壩��package.json��˵��ʹ����Щ������.gitignore���޶����ύ��ʱ����Щ�ļ����Ժ��ԣ��� ��ʵ���������ļ����������޸ĵģ����Լ�ʹ��ʧ�ˣ�Ҳû�й�ϵ�����ǿ��Խ���һ���µ��ļ��У�Ȼ��������ִ��hexo init���ͻ������������ļ�������ֻ��Ҫ�����ǿ�������ʹ�ü��ɡ� �ܽ᣺_config.yml��theme/��source/��scaffolds/��package.json��.gitignore������Ҫ�����ġ���2������������Щ�ļ��ǲ��ؿ����ģ�����˵����ɾ���ģ�������.git�ļ�����������վ���Ŀ¼�£���������Ŀ¼�µ�.git�ļ���������ɾ���� Ȼ�����ļ���node_modules������npm install���������ɣ���public���������hexo gʱ���������ɣ���.deploy_git�ļ��У���ʹ��hexo dʱҲ���������ɣ���db.json�ļ��� ��ʵ������Щ�ļ�Ҳ������.gitignore�ļ�������صĿ��Ժ��Ե����ݡ� �ܽ᣺.git/��node_modules/��public/��.deploy_git/��db.json�ļ���Ҫɾ���� ����������װ Git�ӹ���Git����git�����µ����ϰ�װ����Ϊhttps�ٶ���������ÿ�ζ�Ҫ���������õ���ʹ��ssh��ʹ�����淽����������git bash�������û����ƺ��ʼ���ַ12$ git config --global user.name "username"$ git config --global user.email "username@example.com" ���û���Ŀ¼�����У�ssh-keygen -t rsa -C ��youremail@example.com�� �����е��ʼ���ַ�����Լ����ʼ���ַ��Ȼ��һ·�س������ɺ󣬻����û���Ŀ¼������.sshĿ¼��������id_rsa��id_rsa.pub�����ļ�������������SSH key��Կ�ԣ�id_rsa��˽Կ��ǧ����й¶��ȥ��id_rsa.pub�ǹ�Կ�����Է��ĵظ����κ��ˡ���½GitHub���򿪡�Settings��-&gt;��SSH and GPG keys����Ȼ������new SSH key������������Title����Key�ı�����ճ����Կid_rsa.pub�ļ������ݣ�ǧ��Ҫճ����˽Կ�ˣ������������Add SSH Key�������Ӧ�ÿ����Ѿ����ӵ�Key�� ��װNode.JS��װ Hexo��git bash�ͻ��ˣ����� npm install hexo-cli -g����ʼ��װhexo����֮ǰ������ npm install hexo -g ��װ�ģ��˴���ʹ����������Ϊ���� npm install hexo-cli -g���װ������޷��ύ����������ܰ汾���⡣ ��װģ����git bash���л�Ŀ¼���¿������ļ����ʹ�� npm install �������ģ�鰲װ��ע�⣺��Ҫ��hexo init��ʼ���������ļ��Ѿ��������ɣ��������ʹ�ã���վ�������ļ�_config.yml�ᱻ��ʼ��ΪĬ��ֵ ͬ����Github12hexo ghexo d �������123$ npm install npm install hexo-deployer-git --save #ͬ��������github����ǰ��ͬ�����ɹ��Ͱ�װ���$ npm install hexo-generator-feed --save #RSS����$ npm install hexo-generator-sitemap --save #վ���ͼ ���ͣ�Coding For Dream����I never feared death or dying, I only fear never trying. �CFast &amp; Furious]]></content>
+    <content type="text"><![CDATA[拷贝原博客文件必须拷贝文件：├──_config.yml├── theme├── scaffolds #文章模板├── package.json #说明使用哪些包├── .gitignore #限定在提交的时候哪些文件可以忽略└── source（1）讨论下哪些文件是必须拷贝的：首先是之前自己修改的文件，像站点配置_config.yml，theme文件夹里面的主题，以及source里面自己写的博客文件，这些肯定要拷贝的。 除此之外，还有三个文件需要有，就是scaffolds文件夹（文章的模板）、package.json（说明使用哪些包）和.gitignore（限定在提交的时候哪些文件可以忽略）。 其实，这三个文件不是我们修改的，所以即使丢失了，也没有关系，我们可以建立一个新的文件夹，然后在里面执行hexo init，就会生成这三个文件，我们只需要将它们拷贝过来使用即可。 总结：_config.yml，theme/，source/，scaffolds/，package.json，.gitignore，是需要拷贝的。（2）再讨论下哪些文件是不必拷贝的，或者说可以删除的：首先是.git文件，无论是在站点根目录下，还是主题目录下的.git文件，都可以删掉。 然后是文件夹node_modules（在用npm install会重新生成），public（这个在用hexo g时会重新生成），.deploy_git文件夹（在使用hexo d时也会重新生成），db.json文件。 其实上面这些文件也就是是.gitignore文件里面记载的可以忽略的内容。 总结：.git/，node_modules/，public/，.deploy_git/，db.json文件需要删除。 环境部署安装 Git从官网Git下载git，在新电脑上安装，因为https速度慢，而且每次都要输入口令，常用的是使用ssh。使用下面方法创建：打开git bash，设置用户名称和邮件地址12$ git config --global user.name "username"$ git config --global user.email "username@example.com" 在用户主目录下运行：ssh-keygen -t rsa -C “youremail@example.com” 把其中的邮件地址换成自己的邮件地址，然后一路回车最后完成后，会在用户主目录下生成.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH key密钥对，id_rsa是私钥，千万不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。登陆GitHub，打开「Settings」-&gt;「SSH and GPG keys」，然后点击「new SSH key」，填上任意Title，在Key文本框里粘贴公钥id_rsa.pub文件的内容（千万不要粘贴成私钥了！），最后点击「Add SSH Key」，你就应该看到已经添加的Key。 安装Node.JS安装 Hexo打开git bash客户端，输入 npm install hexo-cli -g，开始安装hexo由于之前我是用 npm install hexo -g 安装的，此处我使用这个命令。因为我用 npm install hexo-cli -g命令安装后出现无法提交的情况，可能版本问题。 安装模块在git bash中切换目录到新拷贝的文件夹里，使用 npm install 命令，进行模块安装。注意：不要用hexo init初始化，部分文件已经拷贝生成，如果不慎使用，则站点配置文件_config.yml会被初始化为默认值 同步至Github12hexo ghexo d 其它组件123$ npm install npm install hexo-deployer-git --save #同步内容至github，若前面同步不成功就安装这个$ npm install hexo-generator-feed --save #RSS订阅$ npm install hexo-generator-sitemap --save #站点地图 加油！Coding For Dream！！I never feared death or dying, I only fear never trying. –Fast &amp; Furious]]></content>
       <categories>
         <category>hexo</category>
       </categories>
       <tags>
         <tag>hexo</tag>
-        <tag>����</tag>
+        <tag>工具</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[����windows��telnet]]></title>
+    <title><![CDATA[设置windows的telnet]]></title>
     <url>%2F2019%2F06%2F03%2Fwindows-telnet%2F</url>
-    <content type="text"><![CDATA[����ĵ��ԣ���װ��ϵͳʹ��cmd��telnet��ʱ����ʾû�д���������µ�������һҹ�ص����ǰ����ɶҲû�У����ǿ��顣 ��������˵���������windows��telnet���ܼ򵥡�������ͼ����һ����������ѡ����telnet����˿ͻ���ѡ� Ϊ����֤Telnet���������Ƿ����ɹ������ǿ�����cmd�������²���һ�£����ʱ��Ͳ�������ʾtelnet�����޷��ҵ��ˡ� ���ú��ˣ��� ԭ�����ף�ת����ע�����������ͣ�Coding For Dream����I never feared death or dying, I only fear never trying. �CFast &amp; Furious]]></content>
+    <content type="text"><![CDATA[新买的电脑，新装的系统使用cmd的telnet的时候提示没有此命令。用了新电脑真是一夜回到解放前啊，啥也没有，真是考验。 今天来简单说下如何设置windows的telnet，很简单。按照下图步骤一步步来，勾选红框的telnet服务端客户端选项。 为了验证Telnet服务命令是否开启成功，我们可以在cmd命令行下测试一下，这个时候就不会再提示telnet命令无法找到了。 设置好了！！ 原创不易，转载请注明出处！加油！Coding For Dream！！I never feared death or dying, I only fear never trying. –Fast &amp; Furious]]></content>
       <categories>
         <category>telnet</category>
-        <category>ԭ��</category>
+        <category>原创</category>
       </categories>
       <tags>
-        <tag>����</tag>
+        <tag>工具</tag>
         <tag>windows</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[navicat����������µ�mysql��������]]></title>
+    <title><![CDATA[navicat访问虚拟机下的mysql服务问题]]></title>
     <url>%2F2019%2F06%2F01%2Fmysql-accesee-right%2F</url>
-    <content type="text"><![CDATA[���»���̨����������ȫ�����°�װ��һ�飬�ڰ�װ��MysqlServer������Ӧ�û�Ȩ�޺�ȻҲ������һЩ���⡣ ������ΰ�װMysqlServer�������������Բο���ǰд����ƪ���͡� ��VM�ϰ�װ���MySQL��Server֮��ʹ��Navicat�޷��������ӵ�����ʹ��cmd��telnet�����¼����һ�·����Ƿ���û�п����˿ڷ��ʡ� �������ʹ�����ַ���������������⡣1.�رշ���ǽ����򵥵ķ����������κ����ơ����Ƿ���ǽû�����ܾ��������㱼����Ȼ�е����ܾ����ٵ�ɶ��12systemctl stop firewalldsystemctl status firewalld ��ʱ�ٴ�����һ�����ݿ⣬���������ϵġ� ��������˻��ǽ�����ý�Ϊ��ȫ�ķ�ʽ�� 2.ʹ��iptables���п��Ŷ˿ڡ���ʵ����iptables����ǽ���������ع����鿴�˿��Ƿ�ɷ��ʣ�telnet ip �˿ں� ���籾����3306��telnet localhost 3306�� ���ŵĶ˿�λ��/etc/sysconfig/iptables���鿴ʱͨ�� more /etc/sysconfig/iptables ����鿴����뿪�Ŷ˿ڣ��磺3306����1��ͨ��vi /etc/sysconfig/iptables ����༭����һ��-A INPUT -p tcp -m tcp –dport 3306 -j ACCEPT ������2��ִ�� /etc/init.d/iptables restart ���iptables����������3������ /etc/rc.d/init.d/iptables save ���⻰��1.����ĵ��Ծ�Ȼ��ȥcmd������telnet��û�У����Բο���һƪ�ġ�����windows��telnet����2.�����õ�CentOS7.3.1��ʱ��ʹ��iptables������ʾcannot found command��������ΪĬ��ʹ�õ���firewall��Ϊ����ǽ��û�а�װiptables������ʹ����������12345systemctl stop firewalld systemctl mask firewalldyum install -y iptables yum install iptables-services Ȼ�����iptables�ļ����Ϳ�����������������1234systemctl start iptables.servicesystemctl restart iptables.service // ��������ǽʹ������Ч systemctl enable iptables.service // ���÷���ǽ�������� �����������Ƿ�װ��iptables123456789101112131415service iptables status #��װiptables yum install -y iptables #����iptables yum update iptables #��װiptables-services yum install iptables-servicessystemctl disable iptables #��ֹiptables���� systemctl stop iptables #��ͣ���� systemctl enable iptables #�����ֹiptables systemctl start iptables #�������� ��ʵfirewall��iptables���Ƿ���ǽ��ʵ�ֵ�ԭ����һ�����ˣ������ﲻ����˵�� ԭ�����ף�ת����ע�����������ͣ�Coding For Dream����I never feared death or dying, I only fear never trying. �CFast &amp; Furious]]></content>
+    <content type="text"><![CDATA[最新换了台机器，软件全部重新安装了一遍，在安装完MysqlServer赋予相应用户权限后当然也遇到了一些问题。 关于如何安装MysqlServer及遇到问题可以参考以前写的两篇博客。 在VM上安装完成MySQL—Server之后使用Navicat无法正常连接到服务。使用cmd的telnet看了下检查了一下发现是服务没有开启端口访问。 下面可以使用两种方法解决解决这个问题。1.关闭防火墙。最简单的方案，不做任何限制。但是防火墙没有了总觉得像是裸奔，虽然行但是总觉得少点啥。12systemctl stop firewalldsystemctl status firewalld 此时再次连接一下数据库，发现是连上的。 但即便如此还是建议采用较为安全的方式。 2.使用iptables进行开放端口。其实是在iptables防火墙中配置拦截规则。查看端口是否可访问：telnet ip 端口号 （如本机的3306：telnet localhost 3306） 开放的端口位于/etc/sysconfig/iptables中查看时通过 more /etc/sysconfig/iptables 命令查看如果想开放端口（如：3306）（1）通过vi /etc/sysconfig/iptables 进入编辑增添一条-A INPUT -p tcp -m tcp –dport 3306 -j ACCEPT 即可（2）执行 /etc/init.d/iptables restart 命令将iptables服务重启（3）保存 /etc/rc.d/init.d/iptables save 题外话：1.刚买的电脑竟然进去cmd，连个telnet都没有，可以参考下一篇的《设置windows的telnet》。2.另我用的CentOS7.3.1的时候使用iptables命令提示cannot found command，那是因为默认使用的是firewall作为防火墙，没有安装iptables，可以使用以下命令12345systemctl stop firewalld systemctl mask firewalldyum install -y iptables yum install iptables-services 然后就有iptables文件，就可以作配置开启服务1234systemctl start iptables.servicesystemctl restart iptables.service // 重启防火墙使配置生效 systemctl enable iptables.service // 设置防火墙开机启动 其他命令：检查是否安装了iptables123456789101112131415service iptables status #安装iptables yum install -y iptables #升级iptables yum update iptables #安装iptables-services yum install iptables-servicessystemctl disable iptables #禁止iptables服务 systemctl stop iptables #暂停服务 systemctl enable iptables #解除禁止iptables systemctl start iptables #开启服务 其实firewall和iptables都是防火墙，实现的原理不一样罢了，在这里不做多说。 原创不易，转载请注明出处！加油！Coding For Dream！！I never feared death or dying, I only fear never trying. –Fast &amp; Furious]]></content>
       <categories>
         <category>Mysql</category>
         <category>Navicat</category>
-        <category>ԭ��</category>
+        <category>原创</category>
       </categories>
       <tags>
-        <tag>����</tag>
+        <tag>工具</tag>
         <tag>Mysql</tag>
-        <tag>������</tag>
+        <tag>问题解决</tag>
       </tags>
   </entry>
   <entry>
